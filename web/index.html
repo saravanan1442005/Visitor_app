@@ -547,13 +547,24 @@
       <span style="color: var(--text-muted);">❯</span>
     </div>
 
-    <div class="big-btn" onclick="triggerCameraPopup()">
+    <div class="big-btn" onclick="triggerCameraPopup(null, 'face')">
       <div class="big-btn-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">
-        🚨
+        👤
       </div>
       <div style="flex:1;">
-        <div class="big-btn-title">Simulate Camera Match Alert</div>
-        <div class="big-btn-subtitle">Test popup notification for frequent visitor</div>
+        <div class="big-btn-title">InsightFace AI Match Alert</div>
+        <div class="big-btn-subtitle">Simulate face camera recognition match (ArcFace 512-d)</div>
+      </div>
+      <span style="color: var(--text-muted);">❯</span>
+    </div>
+
+    <div class="big-btn" onclick="triggerCameraPopup(null, 'plate')">
+      <div class="big-btn-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">
+        🚗
+      </div>
+      <div style="flex:1;">
+        <div class="big-btn-title">ANPR Plate Camera Match Alert</div>
+        <div class="big-btn-subtitle">Simulate license plate recognition match (TN19BE2844)</div>
       </div>
       <span style="color: var(--text-muted);">❯</span>
     </div>
@@ -722,40 +733,56 @@
 </div>
 
 <script>
-  // Initial visitor data loaded directly from Supabase / Gate system
-  const mockVisitors = [
-    {
-      id: 2,
-      visitor_code: 'VIS-10002',
-      full_name: 'SARAVANAN S',
-      phone_number: '07010783677',
-      phone_last4: '3677',
-      vehicle_number: 'TN19BE2844',
-      company: 'EcoTech Innovations',
-      category: 'Official / Business',
-      total_visits: 3,
-      is_present: true
-    },
-    {
-      id: 1,
-      visitor_code: 'VIS-10001',
-      full_name: 'Test Gate Visitor',
-      phone_number: '9840123456',
-      phone_last4: '3456',
-      vehicle_number: 'TN01AB1234',
-      company: 'Alpha Logistics',
-      category: 'Delivery / Courier',
-      total_visits: 2,
-      is_present: true
-    }
-  ];
-
-  let currentVisitors = [...mockVisitors];
+  const API_BASE = 'http://127.0.0.1:5000';
+  let currentVisitors = [];
   let matchedReturning = null;
+  let authToken = null;
+
+  async function ensureAuth() {
+    if (authToken) return authToken;
+    try {
+      const res = await fetch(`${API_BASE}/api/v2/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@example.com', password: 'Admin@12345' })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        authToken = data.token;
+      }
+    } catch (e) {
+      console.warn('Auth note:', e);
+    }
+    return authToken;
+  }
+
+  function getHeaders(extra = {}) {
+    const headers = { 'X-Guard-App': 'true', ...extra };
+    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+    return headers;
+  }
+
+  async function loadLiveVisitors() {
+    await ensureAuth();
+    try {
+      const res = await fetch(`${API_BASE}/api/v2/visitors?limit=100`, {
+        headers: getHeaders()
+      });
+      if (res.ok) {
+        const data = await res.json();
+        currentVisitors = data.visitors || [];
+        renderDashboard();
+        renderActiveList();
+        renderFrequentList();
+      }
+    } catch (e) {
+      console.warn('API sync error:', e);
+    }
+  }
 
   function renderDashboard() {
     const active = currentVisitors.filter(v => v.is_present);
-    const frequent = currentVisitors.filter(v => v.total_visits >= 2);
+    const frequent = currentVisitors.filter(v => (v.total_visits || 0) >= 2);
 
     document.getElementById('activeCount').innerText = active.length;
     document.getElementById('frequentCount').innerText = frequent.length;
@@ -772,11 +799,11 @@
       const card = document.createElement('div');
       card.className = 'visitor-card';
       card.innerHTML = `
-        <div class="visitor-avatar">${v.full_name[0]}</div>
+        <div class="visitor-avatar">${v.full_name ? v.full_name[0].toUpperCase() : 'V'}</div>
         <div class="visitor-info">
           <div class="visitor-name-row">
             <span class="visitor-name">${v.full_name}</span>
-            ${v.total_visits >= 2 ? `<span class="frequent-tag">${v.total_visits} visits</span>` : ''}
+            ${(v.total_visits || 0) >= 2 ? `<span class="frequent-tag">${v.total_visits} visits</span>` : ''}
           </div>
           <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
         </div>
@@ -786,19 +813,29 @@
     });
   }
 
-  function checkOutVisitor(id) {
-    const v = currentVisitors.find(x => x.id === id);
-    if (v) {
-      v.is_present = false;
-      renderDashboard();
-      renderActiveList();
-      alert(`Visitor ${v.full_name} checked-out.`);
+  async function checkOutVisitor(id) {
+    try {
+      await ensureAuth();
+      const res = await fetch(`${API_BASE}/api/v2/registration/exit`, {
+        method: 'POST',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ visitor_id: id, source: 'MANUAL' })
+      });
+      if (res.ok) {
+        await loadLiveVisitors();
+        alert('Visitor checked out successfully.');
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to check out visitor.');
+      }
+    } catch (e) {
+      alert('Network error connecting to gate server: ' + e);
     }
   }
 
-  // Smart Lookup: Auto-fetch returning visitor
-  function handleLookup(query) {
-    const q = query.trim().toLowerCase();
+  // Smart Lookup: Auto-fetch returning visitor from live DB
+  async function handleLookup(query) {
+    const q = query.trim();
     const banner = document.getElementById('returningBanner');
     if (q.length < 3) {
       banner.style.display = 'none';
@@ -806,90 +843,144 @@
       return;
     }
 
-    const match = currentVisitors.find(v => 
-      v.full_name.toLowerCase().includes(q) ||
-      (v.phone_number && v.phone_number.includes(q)) ||
-      (v.vehicle_number && v.vehicle_number.toLowerCase().includes(q)) ||
-      v.visitor_code.toLowerCase().includes(q)
-    );
+    try {
+      await ensureAuth();
+      const res = await fetch(`${API_BASE}/api/v2/registration/search?q=${encodeURIComponent(q)}`, {
+        headers: getHeaders()
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.visitors || [];
+        if (list.length > 0) {
+          matchedReturning = list[0];
+          document.getElementById('bannerName').innerText = matchedReturning.full_name;
+          document.getElementById('bannerVisitsText').innerText = `⭐ RETURNING VISITOR FOUND (${matchedReturning.total_visits || 1} PREVIOUS VISITS)`;
+          document.getElementById('bannerSub').innerText = `Code: ${matchedReturning.visitor_code} • Plate: ${matchedReturning.vehicle_number || 'None'} • Company: ${matchedReturning.company || 'N/A'}`;
+          banner.style.display = 'flex';
 
-    if (match) {
-      matchedReturning = match;
-      document.getElementById('bannerName').innerText = match.full_name;
-      document.getElementById('bannerVisitsText').innerText = `⭐ RETURNING VISITOR FOUND (${match.total_visits} PREVIOUS VISITS)`;
-      document.getElementById('bannerSub').innerText = `Code: ${match.visitor_code} • Plate: ${match.vehicle_number || 'None'} • Company: ${match.company || 'N/A'}`;
-      banner.style.display = 'flex';
+          // Autofill fields
+          document.getElementById('formName').value = matchedReturning.full_name;
+          document.getElementById('formPhone').value = matchedReturning.phone_number || '';
+          document.getElementById('formPlate').value = matchedReturning.vehicle_number || '';
+          document.getElementById('formCompany').value = matchedReturning.company || '';
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
 
-      // Autofill fields
-      document.getElementById('formName').value = match.full_name;
-      document.getElementById('formPhone').value = match.phone_number || '';
-      document.getElementById('formPlate').value = match.vehicle_number || '';
-      document.getElementById('formCompany').value = match.company || '';
-    } else {
-      banner.style.display = 'none';
-      matchedReturning = null;
+    banner.style.display = 'none';
+    matchedReturning = null;
+  }
+
+  async function confirmReturningEntry() {
+    if (!matchedReturning) return;
+    try {
+      await ensureAuth();
+      const res = await fetch(`${API_BASE}/api/v2/registration/entries`, {
+        method: 'POST',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ visitor_id: matchedReturning.id, source: 'GUARD_CONFIRMED' })
+      });
+      if (res.ok) {
+        await loadLiveVisitors();
+        alert(`Entry confirmed for returning visitor: ${matchedReturning.full_name} (Total visits: ${(matchedReturning.total_visits || 0) + 1})`);
+        showDashboard();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to check in.');
+      }
+    } catch (e) {
+      alert('Network error connecting to gate server: ' + e);
     }
   }
 
-  function confirmReturningEntry() {
-    if (!matchedReturning) return;
-    matchedReturning.is_present = true;
-    matchedReturning.total_visits += 1;
-    renderDashboard();
-    alert(`Entry confirmed for returning visitor: ${matchedReturning.full_name} (Visit #${matchedReturning.total_visits})`);
-    showDashboard();
-  }
-
-  function submitNewVisitor() {
+  async function submitNewVisitor() {
     const name = document.getElementById('formName').value.trim();
     const phone = document.getElementById('formPhone').value.trim();
+    const plate = document.getElementById('formPlate').value.trim().toUpperCase();
+    const company = document.getElementById('formCompany').value.trim();
+    const category = document.getElementById('formCategory').value;
+    const notes = document.getElementById('formNotes').value.trim();
+
     if (!name || !phone) {
       alert('Please fill in Full Name and Phone Number.');
       return;
     }
 
     if (matchedReturning) {
-      confirmReturningEntry();
+      await confirmReturningEntry();
       return;
     }
 
-    const newV = {
-      id: currentVisitors.length + 1,
-      visitor_code: 'VIS-' + (10000 + currentVisitors.length + 1),
-      full_name: name,
-      phone_number: phone,
-      vehicle_number: document.getElementById('formPlate').value.trim().toUpperCase() || null,
-      company: document.getElementById('formCompany').value.trim() || null,
-      category: document.getElementById('formCategory').value,
-      total_visits: 1,
-      is_present: true
-    };
+    try {
+      await ensureAuth();
+      const formData = new FormData();
+      formData.append('full_name', name);
+      formData.append('phone', phone);
+      if (plate) formData.append('vehicle_number', plate);
+      if (company) formData.append('company', company);
+      formData.append('category', category);
+      if (notes) formData.append('notes', notes);
 
-    currentVisitors.push(newV);
-    renderDashboard();
-    alert(`Pass Issued! Code: ${newV.visitor_code} for ${newV.full_name}`);
-    showDashboard();
+      const res = await fetch(`${API_BASE}/api/v2/registration/visitors`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.ok && data.visitor) {
+        // Automatically confirm entry
+        await fetch(`${API_BASE}/api/v2/registration/entries`, {
+          method: 'POST',
+          headers: getHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ visitor_id: data.visitor.id, source: 'GUARD_MANUAL' })
+        });
+
+        await loadLiveVisitors();
+        alert(`Pass Issued! Code: ${data.visitor.visitor_code} for ${data.visitor.full_name}`);
+        showDashboard();
+      } else {
+        alert(data.error || 'Failed to register visitor.');
+      }
+    } catch (e) {
+      alert('Network error connecting to server: ' + e);
+    }
   }
 
   // Camera Match Pop-up Alert
-  function triggerCameraPopup(visitor) {
-    const target = visitor || currentVisitors.find(v => v.id === 2) || currentVisitors[0];
-    document.getElementById('modalAvatar').innerText = target.full_name[0];
+  function triggerCameraPopup(visitor, mode = 'face') {
+    const target = visitor || currentVisitors.find(v => v.id === 2) || currentVisitors[0] || {
+      full_name: 'SARAVANAN S', visitor_code: 'VIS-10002', total_visits: 3, vehicle_number: 'TN19BE2844', company: 'EcoTech Innovations', phone_number: '07010783677'
+    };
+    document.getElementById('modalAvatar').innerText = target.full_name ? target.full_name[0].toUpperCase() : 'V';
     document.getElementById('modalName').innerText = target.full_name;
     document.getElementById('modalCode').innerText = target.visitor_code;
     document.getElementById('modalCompany').innerText = target.company || 'Visitor';
     document.getElementById('modalPlate').innerText = target.vehicle_number || 'N/A';
-    document.getElementById('modalVisits').innerText = `${target.total_visits} Visits (Frequent Visitor)`;
+    document.getElementById('modalVisits').innerText = `${target.total_visits || 1} Visits (Frequent Visitor)`;
     document.getElementById('modalPhone').innerText = target.phone_number || 'N/A';
 
-    // Play subtle audio beep/notification chime
+    const isFace = mode === 'face';
+    const alertHeader = document.querySelector('#cameraModal .alert-header');
+    if (alertHeader) {
+      alertHeader.querySelector('h3').innerText = isFace 
+        ? 'FREQUENT VISITOR FACE MATCH (INSIGHTFACE)' 
+        : 'FREQUENT VISITOR PLATE MATCH (ANPR)';
+      alertHeader.querySelector('p').innerText = isFace 
+        ? 'Gate 1 AI Face Cam • ArcFace 512-d Match (98.7% Confidence)' 
+        : 'Gate 1 Vehicle Lane • ANPR Consensus Match (97.8% Confidence)';
+    }
+
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(isFace ? 920 : 840, audioCtx.currentTime);
       gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.18);
@@ -902,13 +993,23 @@
     document.getElementById('cameraModal').style.display = 'none';
   }
 
-  function confirmModalEntry() {
+  async function confirmModalEntry() {
     closeModal();
     const target = currentVisitors.find(v => v.id === 2) || currentVisitors[0];
-    target.is_present = true;
-    target.total_visits += 1;
-    renderDashboard();
-    alert(`Entry confirmed for ${target.full_name} at Gate 1.`);
+    if (target) {
+      try {
+        await ensureAuth();
+        await fetch(`${API_BASE}/api/v2/registration/entries`, {
+          method: 'POST',
+          headers: getHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ visitor_id: target.id, source: 'CAMERA_MATCH_CONFIRMED' })
+        });
+        await loadLiveVisitors();
+        alert(`Entry confirmed for ${target.full_name} at Gate 1.`);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
   }
 
   // Navigation handlers
@@ -1005,8 +1106,10 @@
 
   document.getElementById('btnSimulate').addEventListener('click', () => triggerCameraPopup());
 
-  // Initial load
-  renderDashboard();
+  // Initial load from live backend database
+  loadLiveVisitors();
+  // Auto-sync with live backend every 3 seconds
+  setInterval(loadLiveVisitors, 3000);
 </script>
 
 </body>

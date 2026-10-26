@@ -10,6 +10,7 @@ import '../models/camera_match_event.dart';
 
 class ApiService extends ChangeNotifier {
   String _baseUrl = AppConstants.defaultApiBaseUrl;
+  String? _token;
   bool _isOnline = false;
   Timer? _pollingTimer;
 
@@ -30,6 +31,7 @@ class ApiService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       _baseUrl = prefs.getString(AppConstants.keyApiUrl) ?? AppConstants.defaultApiBaseUrl;
       notifyListeners();
+      await _authenticate();
       await checkHealth();
       _startCameraAlertPolling();
     } catch (e) {
@@ -37,10 +39,41 @@ class ApiService extends ChangeNotifier {
     }
   }
 
+  Future<void> _authenticate() async {
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/api/v2/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': 'admin@example.com', 'password': 'Admin@12345'}),
+      ).timeout(const Duration(seconds: 4));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        _token = data['token'];
+        debugPrint('Guard app authenticated with gate server.');
+      }
+    } catch (e) {
+      debugPrint('Guard auth error: $e');
+    }
+  }
+
+  Map<String, String> _getHeaders([Map<String, String>? extra]) {
+    final headers = <String, String>{
+      'X-Guard-App': 'true',
+    };
+    if (_token != null) {
+      headers['Authorization'] = 'Bearer $_token';
+    }
+    if (extra != null) {
+      headers.addAll(extra);
+    }
+    return headers;
+  }
+
   Future<void> updateBaseUrl(String url) async {
     _baseUrl = url.trim().replaceAll(RegExp(r'/+$'), '');
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(AppConstants.keyApiUrl, _baseUrl);
+    await _authenticate();
     await checkHealth();
     notifyListeners();
   }
@@ -62,13 +95,13 @@ class ApiService extends ChangeNotifier {
     if (clean.isEmpty) return [];
 
     try {
-      // 1. Try Backend Registration Search endpoint
+      if (_token == null) await _authenticate();
       final isDigits = RegExp(r'^\d+$').hasMatch(clean);
       final url = isDigits && clean.length == 4
           ? '$_baseUrl/api/v2/registration/search?last4=$clean'
           : '$_baseUrl/api/v2/registration/search?q=${Uri.encodeComponent(clean)}';
 
-      final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 4));
+      final res = await http.get(Uri.parse(url), headers: _getHeaders()).timeout(const Duration(seconds: 4));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
         final list = (data['visitors'] as List? ?? [])
@@ -80,7 +113,6 @@ class ApiService extends ChangeNotifier {
       debugPrint('Search backend error: $e');
     }
 
-    // Fallback Mock data for demo/offline test
     return _getMockSearchResults(clean);
   }
 
