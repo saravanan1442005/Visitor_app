@@ -474,8 +474,112 @@
     .nav-item.active {
       color: var(--accent-green);
     }
-    .nav-icon {
-      font-size: 20px;
+    /* Mobile Camera Scanner View */
+    .scanner-container {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      background: #000;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+      margin-bottom: 14px;
+    }
+    .scanner-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .scanner-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px;
+    }
+    .scanner-reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 230px;
+      border: 2px dashed rgba(16, 185, 129, 0.7);
+      border-radius: 18px;
+      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.35);
+    }
+    .scanner-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #10b981, transparent);
+      box-shadow: 0 0 12px #10b981;
+      animation: scanLaser 2s infinite ease-in-out;
+    }
+    @keyframes scanLaser {
+      0% { top: 6%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 94%; opacity: 0; }
+    }
+    .scanner-badge {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .scanner-status-text {
+      align-self: center;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #fff;
+      font-weight: 600;
+      border: 1px solid var(--border-dark);
+      text-align: center;
+      max-width: 90%;
+    }
+    .scanner-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .scanner-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border-dark);
+      background: var(--surface-dark);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .scanner-btn:active {
+      transform: scale(0.98);
+    }
+    .scanner-btn.active {
+      background: var(--accent-green);
+      color: #000;
+      border-color: var(--accent-green);
     }
   </style>
 </head>
@@ -547,24 +651,27 @@
       <span style="color: var(--text-muted);">❯</span>
     </div>
 
+    <div class="big-btn" onclick="showScannerView()" style="border: 2px solid rgba(16, 185, 129, 0.5); background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(17, 24, 39, 0.9));">
+      <div class="big-btn-icon" style="background: rgba(16, 185, 129, 0.25); color: var(--accent-green); font-size: 26px;">
+        📷
+      </div>
+      <div style="flex:1;">
+        <div class="big-btn-title" style="color: var(--accent-green); display: flex; align-items: center; gap: 6px;">
+          <span>Open Mobile Entry Camera</span>
+          <span style="font-size: 9px; font-weight: 800; background: var(--accent-green); color: #000; padding: 1px 5px; border-radius: 4px;">LIVE AI</span>
+        </div>
+        <div class="big-btn-subtitle">Scan & recognize visitors live via phone camera (InsightFace)</div>
+      </div>
+      <span style="color: var(--accent-green); font-weight: 800;">START ❯</span>
+    </div>
+
     <div class="big-btn" onclick="triggerCameraPopup(null, 'face')">
       <div class="big-btn-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">
         👤
       </div>
       <div style="flex:1;">
-        <div class="big-btn-title">InsightFace AI Match Alert</div>
-        <div class="big-btn-subtitle">Simulate face camera recognition match (ArcFace 512-d)</div>
-      </div>
-      <span style="color: var(--text-muted);">❯</span>
-    </div>
-
-    <div class="big-btn" onclick="triggerCameraPopup(null, 'plate')">
-      <div class="big-btn-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">
-        🚗
-      </div>
-      <div style="flex:1;">
-        <div class="big-btn-title">ANPR Plate Camera Match Alert</div>
-        <div class="big-btn-subtitle">Simulate license plate recognition match (TN19BE2844)</div>
+        <div class="big-btn-title">InsightFace AI Match Simulation</div>
+        <div class="big-btn-subtitle">Test popup alert for enrolled visitor face (ArcFace 512-d)</div>
       </div>
       <span style="color: var(--text-muted);">❯</span>
     </div>
@@ -644,7 +751,82 @@
     </div>
   </main>
 
-  <!-- View 3: Active Visitors Inside -->
+  <!-- View 3: Live Mobile Entry Camera Scanner -->
+  <main class="content view-screen" id="viewScanner">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
+        <h2 style="font-size: 16px; font-weight: 800;">LIVE ENTRY SCANNER</h2>
+      </div>
+      <span id="scannerStatusPill" style="font-size: 10px; font-weight: 800; background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 8px; border-radius: 6px;">READY</span>
+    </div>
+
+    <!-- Viewfinder -->
+    <div class="scanner-container" id="scannerContainer">
+      <video id="scannerVideo" class="scanner-video" autoplay playsinline muted></video>
+      <canvas id="scannerCanvas" style="display: none;"></canvas>
+      <div class="scanner-overlay">
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+          <div class="scanner-badge">
+            <span class="pulse-dot"></span>
+            <span>InsightFace ArcFace 512-d</span>
+          </div>
+          <button onclick="toggleCameraFacing()" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; pointer-events: auto;">
+            🔄 Flip Cam
+          </button>
+        </div>
+        <div class="scanner-reticle">
+          <div class="scanner-line"></div>
+        </div>
+        <div class="scanner-status-text" id="scannerScanInfo">
+          Align visitor's face inside frame • Auto-scanning...
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="scanner-controls">
+      <button class="scanner-btn active" id="btnToggleScanner" onclick="toggleScannerLoop()">
+        <span id="scannerToggleIcon">⏸️</span> <span id="scannerToggleText">Pause Scanning</span>
+      </button>
+      <button class="scanner-btn" onclick="captureManualScan()">
+        <span>📸</span> <span>Manual Scan</span>
+      </button>
+    </div>
+
+    <!-- Live Match Banner -->
+    <div id="scannerMatchBanner" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <span style="font-size: 10px; font-weight: 800; color: var(--accent-amber);">VISITOR RECOGNIZED</span>
+          <div style="font-size: 15px; font-weight: 800; color: #fff;" id="bannerMatchName">Visitor Name</div>
+          <div style="font-size: 11px; color: var(--text-muted);" id="bannerMatchCode">VIS-XXXX • 98% match</div>
+        </div>
+        <button onclick="confirmScannerMatchedEntry()" style="background: var(--accent-green); color: #000; font-weight: 800; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">
+          ✓ Confirm Entry
+        </button>
+      </div>
+    </div>
+
+    <!-- Continuous RTSP / IP Webcam Guide Card -->
+    <div style="background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 14px; padding: 14px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span style="font-size: 16px;">📡</span>
+        <h4 style="font-size: 13px; font-weight: 700;">Use as Stationary Gate CCTV Stream</h4>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
+        To stream this phone continuously to the Desktop Control Room:
+      </p>
+      <div style="font-size: 11px; color: var(--text-muted); background: var(--bg-dark); padding: 10px; border-radius: 8px; line-height: 1.6;">
+        <b>1.</b> Install <b>IP Webcam</b> (Free on Google Play) or <b>DroidCam</b><br>
+        <b>2.</b> Tap <i>Start Server</i> on your phone<br>
+        <b>3.</b> Note the address (e.g. <code>http://10.64.11.X:8080/video</code>)<br>
+        <b>4.</b> On PC (<a href="http://10.64.11.156:5000" target="_blank" style="color:var(--accent-blue);">http://10.64.11.156:5000</a>), paste that URL in Camera Settings!
+      </div>
+    </div>
+  </main>
+
+  <!-- View 4: Active Visitors Inside -->
   <main class="content view-screen" id="viewActive">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
       <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
@@ -653,7 +835,7 @@
     <div id="fullActiveList"></div>
   </main>
 
-  <!-- View 4: Frequent Visitors -->
+  <!-- View 5: Frequent Visitors -->
   <main class="content view-screen" id="viewHistory">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
       <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
@@ -667,6 +849,10 @@
     <div class="nav-item active" id="navDash" onclick="showDashboard()">
       <span class="nav-icon">📊</span>
       <span>Cockpit</span>
+    </div>
+    <div class="nav-item" id="navScanner" onclick="showScannerView()">
+      <span class="nav-icon">📷</span>
+      <span>Scanner</span>
     </div>
     <div class="nav-item" id="navEntry" onclick="showEntryForm()">
       <span class="nav-icon">➕</span>
@@ -733,10 +919,21 @@
 </div>
 
 <script>
-  const API_BASE = 'http://127.0.0.1:5000';
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:5000'
+    : `http://${window.location.hostname}:5000`;
   let currentVisitors = [];
   let matchedReturning = null;
+  let activeModalVisitor = null;
   let authToken = null;
+
+  // Mobile Camera Scanner State
+  let scannerStream = null;
+  let scannerInterval = null;
+  let currentFacingMode = 'environment';
+  let isScanningPaused = false;
+  let isScanInProgress = false;
+  let latestScannerMatch = null;
 
   async function ensureAuth() {
     if (authToken) return authToken;
@@ -953,8 +1150,10 @@
   // Camera Match Pop-up Alert
   function triggerCameraPopup(visitor, mode = 'face') {
     const target = visitor || currentVisitors.find(v => v.id === 2) || currentVisitors[0] || {
-      full_name: 'SARAVANAN S', visitor_code: 'VIS-10002', total_visits: 3, vehicle_number: 'TN19BE2844', company: 'EcoTech Innovations', phone_number: '07010783677'
+      id: 2, full_name: 'SARAVANAN S', visitor_code: 'VIS-10002', total_visits: 3, vehicle_number: 'TN19BE2844', company: 'EcoTech Innovations', phone_number: '07010783677'
     };
+    activeModalVisitor = target;
+
     document.getElementById('modalAvatar').innerText = target.full_name ? target.full_name[0].toUpperCase() : 'V';
     document.getElementById('modalName').innerText = target.full_name;
     document.getElementById('modalCode').innerText = target.visitor_code;
@@ -970,7 +1169,7 @@
         ? 'FREQUENT VISITOR FACE MATCH (INSIGHTFACE)' 
         : 'FREQUENT VISITOR PLATE MATCH (ANPR)';
       alertHeader.querySelector('p').innerText = isFace 
-        ? 'Gate 1 AI Face Cam • ArcFace 512-d Match (98.7% Confidence)' 
+        ? 'Gate 1 Mobile Cam • ArcFace 512-d Match (98.7% Confidence)' 
         : 'Gate 1 Vehicle Lane • ANPR Consensus Match (97.8% Confidence)';
     }
 
@@ -995,7 +1194,7 @@
 
   async function confirmModalEntry() {
     closeModal();
-    const target = currentVisitors.find(v => v.id === 2) || currentVisitors[0];
+    const target = activeModalVisitor || currentVisitors[0];
     if (target) {
       try {
         await ensureAuth();
@@ -1012,13 +1211,171 @@
     }
   }
 
+  // --- MOBILE ENTRY CAMERA SCANNER CONTROLS ---
+  async function startMobileScanner() {
+    try {
+      stopMobileScanner();
+      const constraints = {
+        video: {
+          facingMode: { ideal: currentFacingMode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      };
+      scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+      const video = document.getElementById('scannerVideo');
+      video.srcObject = scannerStream;
+      await video.play();
+
+      document.getElementById('scannerStatusPill').innerText = 'CAMERA LIVE';
+      document.getElementById('scannerStatusPill').style.color = 'var(--accent-green)';
+      document.getElementById('scannerScanInfo').innerText = 'Align visitor face inside frame • Auto-scanning...';
+      startScannerLoop();
+    } catch (err) {
+      console.warn('Camera access error:', err);
+      document.getElementById('scannerStatusPill').innerText = 'PERMISSION REQUIRED';
+      document.getElementById('scannerStatusPill').style.color = 'var(--accent-red)';
+      document.getElementById('scannerScanInfo').innerText = 'Please allow camera permission in browser to scan visitors.';
+    }
+  }
+
+  function stopMobileScanner() {
+    if (scannerInterval) {
+      clearInterval(scannerInterval);
+      scannerInterval = null;
+    }
+    if (scannerStream) {
+      scannerStream.getTracks().forEach(track => track.stop());
+      scannerStream = null;
+    }
+    const video = document.getElementById('scannerVideo');
+    if (video) video.srcObject = null;
+  }
+
+  function toggleCameraFacing() {
+    currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+    startMobileScanner();
+  }
+
+  function toggleScannerLoop() {
+    isScanningPaused = !isScanningPaused;
+    const btn = document.getElementById('btnToggleScanner');
+    if (isScanningPaused) {
+      btn.classList.remove('active');
+      document.getElementById('scannerToggleIcon').innerText = '▶️';
+      document.getElementById('scannerToggleText').innerText = 'Resume Scanning';
+      document.getElementById('scannerScanInfo').innerText = 'Scanning paused.';
+    } else {
+      btn.classList.add('active');
+      document.getElementById('scannerToggleIcon').innerText = '⏸️';
+      document.getElementById('scannerToggleText').innerText = 'Pause Scanning';
+      document.getElementById('scannerScanInfo').innerText = 'Align visitor face inside frame • Auto-scanning...';
+    }
+  }
+
+  function startScannerLoop() {
+    if (scannerInterval) clearInterval(scannerInterval);
+    scannerInterval = setInterval(() => {
+      if (!isScanningPaused && !isScanInProgress) {
+        captureAndRecognize();
+      }
+    }, 1500);
+  }
+
+  async function captureAndRecognize() {
+    const video = document.getElementById('scannerVideo');
+    if (!video || video.readyState < 2) return;
+
+    isScanInProgress = true;
+    try {
+      const canvas = document.getElementById('scannerCanvas');
+      const ctx = canvas.getContext('2d');
+      const w = 480;
+      const h = Math.round(video.videoHeight * (480 / video.videoWidth)) || 360;
+      canvas.width = w;
+      canvas.height = h;
+      ctx.drawImage(video, 0, 0, w, h);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      await ensureAuth();
+
+      const res = await fetch(`${API_BASE}/api/v2/registration/face/recognize`, {
+        method: 'POST',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ image: dataUrl })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const matches = data.matches || [];
+        if (matches.length > 0) {
+          const match = matches[0];
+          const visitor = currentVisitors.find(v => v.id === match.visitor_id) || {
+            id: match.visitor_id,
+            full_name: match.full_name,
+            visitor_code: match.visitor_code,
+            total_visits: 2,
+            vehicle_number: 'N/A'
+          };
+          latestScannerMatch = visitor;
+
+          // Update banner
+          const banner = document.getElementById('scannerMatchBanner');
+          if (banner) {
+            document.getElementById('bannerMatchName').innerText = visitor.full_name;
+            document.getElementById('bannerMatchCode').innerText = `${visitor.visitor_code} • ${Math.round(match.confidence * 100)}% ArcFace Match`;
+            banner.style.display = 'block';
+          }
+
+          document.getElementById('scannerScanInfo').innerText = `⭐ Recognized: ${visitor.full_name} (${Math.round(match.confidence * 100)}%)`;
+
+          // Pop up confirmation modal if not already open
+          const modal = document.getElementById('cameraModal');
+          if (modal && modal.style.display !== 'flex') {
+            triggerCameraPopup(visitor, 'face');
+          }
+        } else {
+          document.getElementById('scannerScanInfo').innerText = 'Scanning: No registered visitor face in view.';
+        }
+      }
+    } catch (e) {
+      console.warn('Scanner error:', e);
+    } finally {
+      isScanInProgress = false;
+    }
+  }
+
+  function captureManualScan() {
+    captureAndRecognize();
+  }
+
+  async function confirmScannerMatchedEntry() {
+    if (!latestScannerMatch) return;
+    try {
+      await ensureAuth();
+      await fetch(`${API_BASE}/api/v2/registration/entries`, {
+        method: 'POST',
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ visitor_id: latestScannerMatch.id, source: 'FACE_SCANNER' })
+      });
+      await loadLiveVisitors();
+      alert(`Entry confirmed for ${latestScannerMatch.full_name}!`);
+      document.getElementById('scannerMatchBanner').style.display = 'none';
+    } catch (e) {
+      alert('Error confirming entry: ' + e);
+    }
+  }
+
   // Navigation handlers
   function hideAllViews() {
     document.getElementById('viewDashboard').style.display = 'none';
     document.getElementById('viewEntry').style.display = 'none';
+    document.getElementById('viewScanner').style.display = 'none';
     document.getElementById('viewActive').style.display = 'none';
     document.getElementById('viewHistory').style.display = 'none';
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    stopMobileScanner();
   }
 
   function showDashboard() {
@@ -1026,6 +1383,13 @@
     document.getElementById('viewDashboard').style.display = 'block';
     document.getElementById('navDash').classList.add('active');
     renderDashboard();
+  }
+
+  function showScannerView() {
+    hideAllViews();
+    document.getElementById('viewScanner').style.display = 'block';
+    document.getElementById('navScanner').classList.add('active');
+    startMobileScanner();
   }
 
   function showEntryForm(searchFocus = false) {
