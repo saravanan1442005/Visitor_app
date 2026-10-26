@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
 import '../models/visitor.dart';
@@ -78,7 +80,14 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
           _showSuccessPassDialog(_matchedReturningVisitor!, isReturning: true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to confirm entry. Check server.')),
+            SnackBar(
+              backgroundColor: AppConstants.accentRed,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Failed to confirm entry. Check server.',
+                style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
           );
         }
       }
@@ -107,7 +116,14 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
       setState(() => _isSubmitting = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: AppConstants.accentRed, content: Text('Error: $e')),
+          SnackBar(
+            backgroundColor: AppConstants.accentRed,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
         );
       }
     }
@@ -118,45 +134,112 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppConstants.surfaceDark,
+        backgroundColor: AppConstants.surfaceWhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: AppConstants.accentGreen, size: 28),
-            const SizedBox(width: 10),
-            Text(
-              isReturning ? 'Entry Confirmed!' : 'Visitor Registered!',
-              style: const TextStyle(color: AppConstants.textPrimary, fontSize: 18),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: AppConstants.greenLight,
+                shape: BoxShape.circle,
+              ),
+              child: const HeroIcon(
+                HeroIcons.checkCircle,
+                color: AppConstants.accentGreen,
+                size: 26,
+                style: HeroIconStyle.solid,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                isReturning ? 'Entry Confirmed!' : 'Visitor Registered!',
+                style: GoogleFonts.roboto(
+                  color: AppConstants.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (isReturning)
-              Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppConstants.accentAmber.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
+        content: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppConstants.greenSubtle,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppConstants.accentGreen.withValues(alpha: 0.2)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (isReturning)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppConstants.amberLight,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppConstants.accentAmber.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const HeroIcon(HeroIcons.sparkles, size: 14, color: AppConstants.accentAmber, style: HeroIconStyle.solid),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Returning Visitor (Visit #${visitor.totalVisits + 1})',
+                        style: GoogleFonts.nunito(
+                          color: AppConstants.accentAmber,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Text(
-                  '⭐ Returning Visitor (Visit #${visitor.totalVisits + 1})',
-                  style: const TextStyle(color: AppConstants.accentAmber, fontWeight: FontWeight.bold, fontSize: 12),
+              Text(
+                'Pass Code: ${visitor.visitorCode}',
+                style: GoogleFonts.roboto(
+                  color: AppConstants.accentGreen,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                  letterSpacing: 0.5,
                 ),
               ),
-            Text('Pass Code: ${visitor.visitorCode}', style: const TextStyle(color: AppConstants.accentBlue, fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 6),
-            Text('Name: ${visitor.fullName}', style: const TextStyle(color: AppConstants.textPrimary)),
-            if (visitor.vehicleNumber != null) ...[
+              const SizedBox(height: 8),
+              const Divider(color: AppConstants.borderLight),
+              const SizedBox(height: 8),
+              Text(
+                'Name: ${visitor.fullName}',
+                style: GoogleFonts.nunito(
+                  color: AppConstants.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              if (visitor.vehicleNumber != null && visitor.vehicleNumber!.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Vehicle: ${visitor.vehicleNumber}',
+                  style: GoogleFonts.nunito(
+                    color: AppConstants.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
               const SizedBox(height: 4),
-              Text('Vehicle: ${visitor.vehicleNumber}', style: const TextStyle(color: AppConstants.textSecondary)),
+              Text(
+                'Gate: Gate 1 (Visitor Access)',
+                style: GoogleFonts.nunito(
+                  color: AppConstants.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
             ],
-            const SizedBox(height: 4),
-            Text('Gate: Gate 1 (Visitor Access)', style: const TextStyle(color: AppConstants.textSecondary)),
-          ],
+          ),
         ),
         actions: [
           ElevatedButton(
@@ -166,9 +249,14 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.accentGreen,
-              foregroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Done & Print / Badge', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              'Done & Print Badge',
+              style: GoogleFonts.nunito(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -178,13 +266,22 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppConstants.primaryDark,
+      backgroundColor: AppConstants.scaffoldLight,
       appBar: AppBar(
-        backgroundColor: AppConstants.surfaceDark,
+        backgroundColor: AppConstants.surfaceWhite,
         elevation: 0,
-        title: const Text(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppConstants.borderLight, height: 1),
+        ),
+        title: Text(
           'VISITOR REGISTRATION & ENTRY',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 1.1),
+          style: GoogleFonts.roboto(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.8,
+            color: AppConstants.textPrimary,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -194,50 +291,77 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Search / Autofill Bar
+              // Search / Autofill Bar Card
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppConstants.surfaceDark,
+                  color: AppConstants.surfaceWhite,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppConstants.accentBlue.withOpacity(0.5)),
+                  border: Border.all(color: AppConstants.accentBlue.withValues(alpha: 0.4), width: 1.2),
+                  boxShadow: AppConstants.softShadow,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.search_rounded, color: AppConstants.accentBlue, size: 20),
-                        SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: AppConstants.blueLight,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const HeroIcon(
+                            HeroIcons.magnifyingGlass,
+                            color: AppConstants.accentBlue,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
                         Text(
                           'RETURNING VISITOR LOOKUP',
-                          style: TextStyle(
+                          style: GoogleFonts.roboto(
                             color: AppConstants.accentBlue,
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.1,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: _searchController,
-                      style: const TextStyle(color: AppConstants.textPrimary),
+                      style: GoogleFonts.nunito(color: AppConstants.textPrimary, fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'Enter phone number, last 4 digits, or vehicle plate...',
-                        hintStyle: const TextStyle(color: AppConstants.textSecondary, fontSize: 13),
+                        hintStyle: GoogleFonts.nunito(color: AppConstants.textMuted, fontSize: 13),
                         filled: true,
-                        fillColor: AppConstants.primaryDark,
+                        fillColor: AppConstants.inputFill,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppConstants.borderLight),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppConstants.borderLight),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppConstants.accentBlue, width: 1.5),
+                        ),
                         suffixIcon: _isSearching
                             ? const Padding(
                                 padding: EdgeInsets.all(12),
-                                child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppConstants.accentBlue),
+                                ),
                               )
                             : IconButton(
-                                icon: const Icon(Icons.arrow_forward_rounded, color: AppConstants.accentBlue),
+                                icon: const HeroIcon(HeroIcons.arrowRight, color: AppConstants.accentBlue, size: 18),
                                 onPressed: () => _handleSearch(_searchController.text),
                               ),
                       ),
@@ -252,38 +376,55 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
               // Returning Visitor Detected Banner
               if (_matchedReturningVisitor != null) ...[
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppConstants.accentAmber.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppConstants.accentAmber),
+                    color: AppConstants.surfaceWhite,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppConstants.accentAmber, width: 1.5),
+                    boxShadow: AppConstants.softShadow,
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.stars_rounded, color: AppConstants.accentAmber, size: 30),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: const BoxDecoration(
+                          color: AppConstants.amberLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const HeroIcon(
+                          HeroIcons.sparkles,
+                          color: AppConstants.accentAmber,
+                          size: 26,
+                          style: HeroIconStyle.solid,
+                        ),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'RETURNING VISITOR DETECTED (${_matchedReturningVisitor!.totalVisits} PREVIOUS VISITS)',
-                              style: const TextStyle(
+                              'RETURNING VISITOR (${_matchedReturningVisitor!.totalVisits} PREVIOUS VISITS)',
+                              style: GoogleFonts.roboto(
                                 color: AppConstants.accentAmber,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 11,
-                                letterSpacing: 1.0,
+                                letterSpacing: 0.8,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               '${_matchedReturningVisitor!.fullName} • Code: ${_matchedReturningVisitor!.visitorCode}',
-                              style: const TextStyle(color: AppConstants.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                              style: GoogleFonts.roboto(
+                                color: AppConstants.textPrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                             if (_matchedReturningVisitor!.vehicleNumber != null)
                               Text(
                                 'Plate: ${_matchedReturningVisitor!.vehicleNumber}',
-                                style: const TextStyle(color: AppConstants.textSecondary, fontSize: 12),
+                                style: GoogleFonts.nunito(color: AppConstants.textSecondary, fontSize: 12),
                               ),
                           ],
                         ),
@@ -292,10 +433,14 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                         onPressed: _isSubmitting ? null : _submitEntry,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppConstants.accentAmber,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text('1-Tap Check-In', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        child: Text(
+                          '1-Tap Check-In',
+                          style: GoogleFonts.nunito(fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
                       ),
                     ],
                   ),
@@ -307,21 +452,35 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: AppConstants.surfaceDark,
+                  color: AppConstants.surfaceWhite,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppConstants.borderLight),
+                  boxShadow: AppConstants.softShadow,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'VISITOR INFORMATION',
-                      style: TextStyle(
-                        color: AppConstants.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.1,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: AppConstants.accentGreen,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'VISITOR INFORMATION',
+                          style: GoogleFonts.roboto(
+                            color: AppConstants.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
 
@@ -329,7 +488,8 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                     _buildTextField(
                       controller: _nameController,
                       label: 'Full Name *',
-                      icon: Icons.person_rounded,
+                      heroIcon: HeroIcons.user,
+                      hint: 'e.g. Rahul Sharma',
                       validator: (val) => val == null || val.trim().isEmpty ? 'Full name is required' : null,
                     ),
 
@@ -339,7 +499,8 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                     _buildTextField(
                       controller: _phoneController,
                       label: 'Phone Number *',
-                      icon: Icons.phone_rounded,
+                      heroIcon: HeroIcons.phone,
+                      hint: 'e.g. +91 98765 43210',
                       keyboardType: TextInputType.phone,
                       validator: (val) => val == null || val.trim().length < 10 ? 'Valid phone number required' : null,
                     ),
@@ -350,7 +511,7 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                     _buildTextField(
                       controller: _vehicleController,
                       label: 'Vehicle Plate Number',
-                      icon: Icons.directions_car_rounded,
+                      heroIcon: HeroIcons.truck,
                       hint: 'e.g. TN19BE2844',
                     ),
 
@@ -360,27 +521,35 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                     _buildTextField(
                       controller: _companyController,
                       label: 'Company / Organization',
-                      icon: Icons.business_rounded,
+                      heroIcon: HeroIcons.buildingOffice,
                       hint: 'e.g. EcoTech / Visitor',
                     ),
 
                     const SizedBox(height: 14),
 
                     // Category Dropdown
-                    const Text('Visitor Category', style: TextStyle(color: AppConstants.textSecondary, fontSize: 12)),
+                    Text(
+                      'Visitor Category',
+                      style: GoogleFonts.nunito(
+                        color: AppConstants.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                        color: AppConstants.primaryDark,
-                        borderRadius: BorderRadius.circular(10),
+                        color: AppConstants.inputFill,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppConstants.borderLight),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: _selectedCategory,
-                          dropdownColor: AppConstants.cardDark,
+                          dropdownColor: AppConstants.surfaceWhite,
                           isExpanded: true,
-                          style: const TextStyle(color: AppConstants.textPrimary, fontSize: 14),
+                          style: GoogleFonts.nunito(color: AppConstants.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                           items: AppConstants.visitorCategories
                               .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
                               .toList(),
@@ -397,7 +566,8 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                     _buildTextField(
                       controller: _notesController,
                       label: 'Purpose of Visit / Notes',
-                      icon: Icons.notes_rounded,
+                      heroIcon: HeroIcons.documentText,
+                      hint: 'e.g. Meeting with Facility Manager',
                       maxLines: 2,
                     ),
                   ],
@@ -411,17 +581,27 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                 onPressed: _isSubmitting ? null : _submitEntry,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _matchedReturningVisitor != null ? AppConstants.accentAmber : AppConstants.accentGreen,
-                  foregroundColor: Colors.black,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 4,
+                  elevation: 2,
+                  shadowColor: AppConstants.accentGreen.withValues(alpha: 0.3),
                 ),
                 icon: _isSubmitting
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
-                    : Icon(_matchedReturningVisitor != null ? Icons.repeat_rounded : Icons.check_circle_rounded),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                    : HeroIcon(
+                        _matchedReturningVisitor != null ? HeroIcons.arrowPath : HeroIcons.checkCircle,
+                        size: 20,
+                        color: Colors.white,
+                        style: HeroIconStyle.solid,
+                      ),
                 label: Text(
                   _matchedReturningVisitor != null ? 'CONFIRM RETURNING VISITOR ENTRY' : 'REGISTER & GRANT ENTRY PASS',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.8),
+                  style: GoogleFonts.roboto(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 0.6),
                 ),
               ),
             ],
@@ -434,7 +614,7 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
+    required HeroIcons heroIcon,
     String? hint,
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
@@ -443,22 +623,39 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: AppConstants.textSecondary, fontSize: 12)),
+        Text(
+          label,
+          style: GoogleFonts.nunito(color: AppConstants.textSecondary, fontSize: 12, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
-          style: const TextStyle(color: AppConstants.textPrimary, fontSize: 14),
+          style: GoogleFonts.nunito(color: AppConstants.textPrimary, fontSize: 14),
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppConstants.cardDark, fontSize: 13),
-            prefixIcon: Icon(icon, color: AppConstants.textSecondary, size: 20),
+            hintStyle: GoogleFonts.nunito(color: AppConstants.textMuted, fontSize: 13),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.all(12),
+              child: HeroIcon(heroIcon, color: AppConstants.textSecondary, size: 20),
+            ),
             filled: true,
-            fillColor: AppConstants.primaryDark,
+            fillColor: AppConstants.inputFill,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppConstants.borderLight),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppConstants.borderLight),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppConstants.accentGreen, width: 1.6),
+            ),
           ),
         ),
       ],

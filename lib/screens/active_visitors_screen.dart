@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
 import '../models/visitor.dart';
@@ -44,34 +46,65 @@ class _ActiveVisitorsScreenState extends State<ActiveVisitorsScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppConstants.primaryDark,
+      backgroundColor: AppConstants.scaffoldLight,
       appBar: AppBar(
-        backgroundColor: AppConstants.surfaceDark,
+        backgroundColor: AppConstants.surfaceWhite,
         elevation: 0,
-        title: const Text(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppConstants.borderLight, height: 1),
+        ),
+        title: Text(
           'CURRENTLY INSIDE PREMISES',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 1.1),
+          style: GoogleFonts.roboto(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.8,
+            color: AppConstants.textPrimary,
+          ),
         ),
         actions: [
-          IconButton(onPressed: _fetch, icon: const Icon(Icons.refresh_rounded)),
+          IconButton(
+            onPressed: _fetch,
+            icon: const HeroIcon(HeroIcons.arrowPath, color: AppConstants.textSecondary, size: 20),
+            tooltip: 'Refresh',
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
         children: [
-          // Filter Search Bar
+          // Filter Search Bar Card
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: AppConstants.surfaceDark,
+            decoration: BoxDecoration(
+              color: AppConstants.surfaceWhite,
+              border: const Border(bottom: BorderSide(color: AppConstants.borderLight)),
+            ),
             child: TextField(
-              style: const TextStyle(color: AppConstants.textPrimary),
+              style: GoogleFonts.nunito(color: AppConstants.textPrimary, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'Filter by name, code, or plate...',
-                hintStyle: const TextStyle(color: AppConstants.textSecondary, fontSize: 13),
-                prefixIcon: const Icon(Icons.filter_list_rounded, color: AppConstants.textSecondary, size: 20),
+                hintText: 'Filter by name, code, or vehicle plate...',
+                hintStyle: GoogleFonts.nunito(color: AppConstants.textMuted, fontSize: 13),
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: HeroIcon(HeroIcons.funnel, color: AppConstants.accentGreen, size: 18),
+                ),
                 filled: true,
-                fillColor: AppConstants.primaryDark,
+                fillColor: AppConstants.inputFill,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppConstants.borderLight),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppConstants.borderLight),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppConstants.accentGreen, width: 1.5),
+                ),
               ),
               onChanged: (val) => setState(() => _searchQuery = val),
             ),
@@ -79,12 +112,41 @@ class _ActiveVisitorsScreenState extends State<ActiveVisitorsScreen> {
 
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator(color: AppConstants.accentGreen))
                 : filtered.isEmpty
                     ? Center(
-                        child: Text(
-                          _searchQuery.isEmpty ? 'No active visitors inside.' : 'No matches found.',
-                          style: const TextStyle(color: AppConstants.textSecondary),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: const BoxDecoration(
+                                color: AppConstants.greenLight,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const HeroIcon(
+                                HeroIcons.checkCircle,
+                                color: AppConstants.accentGreen,
+                                size: 36,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              _searchQuery.isEmpty ? 'No active visitors inside.' : 'No matches found.',
+                              style: GoogleFonts.roboto(
+                                color: AppConstants.textPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _searchQuery.isEmpty
+                                  ? 'All checked-in visitors have departed.'
+                                  : 'Try adjusting your search query.',
+                              style: GoogleFonts.nunito(color: AppConstants.textSecondary, fontSize: 13),
+                            ),
+                          ],
                         ),
                       )
                     : ListView.builder(
@@ -106,17 +168,22 @@ class _ActiveVisitorsScreenState extends State<ActiveVisitorsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppConstants.surfaceDark,
+        color: AppConstants.surfaceWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppConstants.borderLight),
+        boxShadow: AppConstants.softShadow,
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: AppConstants.cardDark,
+            backgroundColor: AppConstants.greenLight,
             child: Text(
               v.fullName.isNotEmpty ? v.fullName[0].toUpperCase() : 'V',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: GoogleFonts.roboto(
+                color: AppConstants.accentGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -128,19 +195,28 @@ class _ActiveVisitorsScreenState extends State<ActiveVisitorsScreen> {
                   children: [
                     Text(
                       v.fullName,
-                      style: const TextStyle(color: AppConstants.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+                      style: GoogleFonts.roboto(
+                        color: AppConstants.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                     if (v.isFrequentVisitor) ...[
                       const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppConstants.accentAmber.withOpacity(0.2),
+                          color: AppConstants.amberLight,
                           borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: AppConstants.accentAmber.withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           '${v.totalVisits} visits',
-                          style: const TextStyle(color: AppConstants.accentAmber, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.nunito(
+                            color: AppConstants.accentAmber,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -149,34 +225,50 @@ class _ActiveVisitorsScreenState extends State<ActiveVisitorsScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '${v.visitorCode} • Plate: ${v.vehicleNumber ?? "None"}',
-                  style: const TextStyle(color: AppConstants.textSecondary, fontSize: 12),
+                  style: GoogleFonts.nunito(color: AppConstants.textSecondary, fontSize: 12),
                 ),
-                if (v.company != null)
+                if (v.company != null && v.company!.isNotEmpty)
                   Text(
                     'Company: ${v.company}',
-                    style: const TextStyle(color: AppConstants.textSecondary, fontSize: 11),
+                    style: GoogleFonts.nunito(color: AppConstants.textMuted, fontSize: 11),
                   ),
               ],
             ),
           ),
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () async {
               final api = Provider.of<ApiService>(context, listen: false);
               await api.confirmExit(v.id);
               _fetch();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Visitor ${v.fullName} checked-out successfully.')),
+                  SnackBar(
+                    backgroundColor: AppConstants.accentGreen,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    content: Text(
+                      'Visitor ${v.fullName} checked-out successfully.',
+                      style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppConstants.accentRed.withOpacity(0.2),
+              backgroundColor: AppConstants.redLight,
               foregroundColor: AppConstants.accentRed,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(color: AppConstants.accentRed.withValues(alpha: 0.3)),
+              ),
             ),
-            child: const Text('Exit Pass', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            icon: const HeroIcon(HeroIcons.arrowRightOnRectangle, size: 14, color: AppConstants.accentRed),
+            label: Text(
+              'Exit Pass',
+              style: GoogleFonts.nunito(fontWeight: FontWeight.bold, fontSize: 12),
+            ),
           ),
         ],
       ),

@@ -4,61 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Gate Security Guard — Visitor Cockpit</title>
+  <!-- Google Fonts: Nunito as primary, Roboto for headings -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Roboto:wght@500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090d16;
-      --surface-dark: #111827;
-      --card-dark: #1f2937;
-      --border-dark: #374151;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-red: #ef4444;
-      --accent-blue: #38bdf8;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
+      /* White & #008000 Light Theme */
+      --bg-page: #F8FAFC;
+      --surface-white: #FFFFFF;
+      --card-white: #FFFFFF;
+      --border-light: #E2E8F0;
+      --border-focus: #008000;
+      --input-bg: #F8FAFC;
+      
+      --accent-green: #008000;
+      --accent-green-dark: #006400;
+      --green-light: #E8F5E9;
+      --green-subtle: #F0FDF4;
+
+      --accent-amber: #D97706;
+      --amber-light: #FEF3C7;
+      
+      --accent-red: #DC2626;
+      --red-light: #FEE2E2;
+
+      --accent-blue: #0284C7;
+      --blue-light: #E0F2FE;
+
+      --text-main: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+
+      --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
+      --shadow-hover: 0 8px 24px rgba(0, 128, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.18), 0 0 35px rgba(0, 128, 0, 0.12);
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
+
+    /* Headings in Roboto */
+    h1, h2, h3, h4, .roboto-heading, .section-title, .big-btn-title, .kpi-card .val, .top-bar h1 {
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 800;
+    }
+
     body {
-      background-color: var(--bg-dark);
+      background-color: #EEF2F6;
       color: var(--text-main);
       display: flex;
       justify-content: center;
       min-height: 100vh;
       overflow-x: hidden;
     }
+
     .mobile-frame {
       width: 100%;
       max-width: 480px;
       min-height: 100vh;
-      background-color: var(--bg-dark);
+      background-color: var(--bg-page);
       display: flex;
       flex-direction: column;
       position: relative;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-      border-left: 1px solid rgba(255, 255, 255, 0.05);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      border-left: 1px solid var(--border-light);
+      border-right: 1px solid var(--border-light);
     }
+
+    /* Heroicons utility */
+    .hero-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-block;
+      vertical-align: middle;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+    .hero-icon-sm {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      stroke-width: 2;
+      flex-shrink: 0;
+    }
+    .hero-icon-lg {
+      width: 26px;
+      height: 26px;
+      display: inline-block;
+      vertical-align: middle;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+
     /* Top Bar */
     .top-bar {
-      padding: 16px 20px;
-      background: rgba(17, 24, 39, 0.9);
-      backdrop-filter: blur(12px);
+      padding: 14px 18px;
+      background: var(--surface-white);
       position: sticky;
       top: 0;
       z-index: 40;
-      border-bottom: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
     }
     .top-bar-title {
       display: flex;
@@ -66,33 +122,33 @@
       gap: 12px;
     }
     .shield-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--green-light);
+      border: 1px solid rgba(0, 128, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--accent-green);
-      font-size: 20px;
     }
     .top-bar h1 {
       font-size: 14px;
       font-weight: 800;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.6px;
       color: var(--text-main);
     }
     .top-bar p {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
+      font-weight: 600;
     }
     .top-btn {
-      background: var(--card-dark);
-      color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 6px 12px;
-      border-radius: 8px;
+      background: var(--green-light);
+      color: var(--accent-green);
+      border: 1px solid rgba(0, 128, 0, 0.3);
+      padding: 8px 12px;
+      border-radius: 10px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
@@ -101,36 +157,52 @@
       gap: 6px;
       transition: all 0.2s;
     }
+    .top-btn:hover {
+      background: var(--accent-green);
+      color: #FFFFFF;
+    }
     .top-btn:active {
       transform: scale(0.96);
     }
+
     /* Content Area */
     .content {
-      padding: 18px 20px 90px;
+      padding: 18px 18px 90px;
       flex: 1;
     }
+
     /* Live Camera Bar */
     .camera-banner {
-      background: var(--surface-dark);
-      border: 1px solid var(--border-dark);
+      background: var(--surface-white);
+      border: 1px solid rgba(0, 128, 0, 0.25);
       border-radius: 14px;
       padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
     }
     .camera-status {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+    }
+    .pulse-dot-wrapper {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .pulse-dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
       background: var(--accent-green);
-      box-shadow: 0 0 10px var(--accent-green);
+      box-shadow: 0 0 8px rgba(0, 128, 0, 0.6);
       animation: pulse 1.8s infinite;
     }
     @keyframes pulse {
@@ -141,11 +213,14 @@
     .camera-status h4 {
       font-size: 13px;
       font-weight: 700;
+      color: var(--text-main);
     }
     .camera-status p {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
+      font-weight: 600;
     }
+
     /* KPI Stats */
     .kpi-grid {
       display: grid;
@@ -154,91 +229,130 @@
       margin-bottom: 20px;
     }
     .kpi-card {
-      background: var(--surface-dark);
-      border: 1px solid var(--border-dark);
-      border-radius: 14px;
+      background: var(--surface-white);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
       padding: 16px;
       cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: all 0.2s;
+    }
+    .kpi-card:hover {
+      border-color: var(--accent-green);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .kpi-icon-pill {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .kpi-card .val {
-      font-size: 28px;
-      font-weight: 800;
+      font-size: 30px;
+      font-weight: 900;
       line-height: 1;
-      margin-bottom: 6px;
     }
     .kpi-card .label {
       font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 600;
+      color: var(--text-secondary);
+      font-weight: 700;
     }
+
     /* Action Buttons */
     .section-title {
       font-size: 12px;
       font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: 1px;
+      color: var(--text-secondary);
+      letter-spacing: 0.8px;
       margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+    .section-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: var(--accent-green);
+      border-radius: 2px;
+      display: inline-block;
+    }
+
     .big-btn {
       width: 100%;
-      background: var(--surface-dark);
-      border: 1px solid var(--border-dark);
-      border-radius: 14px;
+      background: var(--surface-white);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
       padding: 16px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       cursor: pointer;
       margin-bottom: 12px;
       transition: all 0.2s;
       text-align: left;
+      box-shadow: var(--shadow-soft);
     }
     .big-btn:hover, .big-btn:active {
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(0, 128, 0, 0.4);
       transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
     }
     .big-btn-icon {
       width: 48px;
       height: 48px;
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
       flex-shrink: 0;
     }
     .big-btn-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-main);
       margin-bottom: 3px;
     }
     .big-btn-subtitle {
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
+      font-weight: 500;
     }
+
     /* Visitor List Items */
     .visitor-card {
-      background: var(--surface-dark);
-      border: 1px solid var(--border-dark);
+      background: var(--surface-white);
+      border: 1px solid var(--border-light);
       border-radius: 14px;
       padding: 14px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 10px;
+      box-shadow: var(--shadow-soft);
     }
     .visitor-avatar {
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: var(--card-dark);
+      background: var(--green-light);
+      border: 1px solid rgba(0, 128, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
+      font-weight: 800;
+      font-family: 'Roboto', sans-serif;
       font-size: 16px;
-      color: #fff;
+      color: var(--accent-green);
       flex-shrink: 0;
     }
     .visitor-info {
@@ -254,39 +368,55 @@
     .visitor-name {
       font-size: 14px;
       font-weight: 700;
+      font-family: 'Roboto', sans-serif;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--text-main);
     }
     .frequent-tag {
-      background: rgba(245, 158, 11, 0.15);
+      background: var(--amber-light);
       color: var(--accent-amber);
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 4px;
       white-space: nowrap;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
     }
     .visitor-sub {
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
+      font-weight: 600;
     }
     .btn-checkout {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: var(--red-light);
+      border: 1px solid rgba(220, 38, 38, 0.3);
       color: var(--accent-red);
-      padding: 6px 10px;
+      padding: 7px 12px;
       border-radius: 8px;
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
     }
+    .btn-checkout:hover {
+      background: var(--accent-red);
+      color: #FFFFFF;
+    }
+
     /* Modal Pop-up */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(6px);
       z-index: 100;
       display: none;
       align-items: center;
@@ -299,13 +429,13 @@
       to { opacity: 1; }
     }
     .modal-box {
-      background: var(--surface-dark);
-      border-radius: 20px;
-      border: 2px solid var(--accent-amber);
-      box-shadow: 0 0 50px rgba(245, 158, 11, 0.35);
+      background: var(--surface-white);
+      border-radius: 24px;
+      border: 2px solid var(--accent-green);
+      box-shadow: var(--shadow-modal);
       width: 100%;
       max-width: 420px;
-      padding: 22px;
+      padding: 24px;
       animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes slideUp {
@@ -322,28 +452,28 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.4);
+      background: var(--green-light);
+      border: 1px solid rgba(0, 128, 0, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--accent-amber);
-      font-size: 22px;
+      color: var(--accent-green);
     }
     .alert-header h3 {
       font-size: 13px;
       font-weight: 800;
-      color: var(--accent-amber);
-      letter-spacing: 0.8px;
+      color: var(--accent-green);
+      letter-spacing: 0.6px;
     }
     .alert-header p {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
+      font-weight: 600;
     }
     .alert-profile {
-      background: var(--bg-dark);
-      border: 1px solid var(--border-dark);
-      border-radius: 14px;
+      background: var(--green-subtle);
+      border: 1px solid rgba(0, 128, 0, 0.15);
+      border-radius: 16px;
       padding: 14px;
       display: flex;
       align-items: center;
@@ -351,8 +481,9 @@
       margin-bottom: 16px;
     }
     .alert-details {
-      background: var(--card-dark);
-      border-radius: 12px;
+      background: var(--bg-page);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
       padding: 12px 14px;
       margin-bottom: 20px;
     }
@@ -361,20 +492,21 @@
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      padding: 5px 0;
+      padding: 6px 0;
     }
     .alert-row:not(:last-child) {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid var(--border-light);
     }
     .plate-badge {
-      background: rgba(245, 158, 11, 0.2);
-      border: 1px solid rgba(245, 158, 11, 0.5);
+      background: var(--amber-light);
+      border: 1px solid rgba(217, 119, 6, 0.4);
       color: var(--accent-amber);
       padding: 2px 8px;
-      border-radius: 4px;
+      border-radius: 6px;
       font-weight: 800;
       font-size: 12px;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
+      font-family: 'Roboto', sans-serif;
     }
     .modal-actions {
       display: flex;
@@ -383,9 +515,9 @@
     .btn-dismiss {
       flex: 1;
       padding: 14px;
-      background: var(--card-dark);
-      border: 1px solid var(--border-dark);
-      color: var(--text-muted);
+      background: var(--bg-page);
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
@@ -395,7 +527,7 @@
       padding: 14px;
       background: var(--accent-green);
       border: none;
-      color: #000;
+      color: #FFFFFF;
       border-radius: 12px;
       font-weight: 800;
       font-size: 14px;
@@ -404,7 +536,9 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 128, 0, 0.25);
     }
+
     /* Entry Form View */
     .view-screen {
       display: none;
@@ -415,171 +549,74 @@
     .form-group label {
       display: block;
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 6px;
-      font-weight: 600;
+      font-weight: 700;
     }
     .form-control {
       width: 100%;
-      background: var(--bg-dark);
-      border: 1px solid var(--border-dark);
-      color: #fff;
+      background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
       padding: 12px 14px;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 14px;
+      font-family: 'Nunito', sans-serif;
     }
     .form-control:focus {
       outline: none;
-      border-color: var(--accent-blue);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(0, 128, 0, 0.1);
     }
     .search-box-card {
-      background: var(--surface-dark);
-      border: 1px solid var(--accent-blue);
-      border-radius: 14px;
-      padding: 14px;
+      background: var(--surface-white);
+      border: 1.5px solid var(--accent-blue);
+      border-radius: 16px;
+      padding: 16px;
       margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
     }
     .returning-banner {
-      background: rgba(245, 158, 11, 0.15);
+      background: var(--amber-light);
       border: 1px solid var(--accent-amber);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-radius: 14px;
+      padding: 14px;
       margin-bottom: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
+
     /* Bottom Navigation */
     .bottom-nav {
       position: sticky;
       bottom: 0;
-      background: rgba(17, 24, 39, 0.95);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border-dark);
+      background: var(--surface-white);
+      border-top: 1px solid var(--border-light);
       display: flex;
       justify-content: space-around;
-      padding: 10px 0;
+      padding: 8px 0 10px;
       z-index: 40;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
     }
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       color: var(--text-muted);
       cursor: pointer;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
+      transition: all 0.2s;
+      padding: 4px 12px;
+      border-radius: 8px;
     }
     .nav-item.active {
       color: var(--accent-green);
     }
-    /* Mobile Camera Scanner View */
-    .scanner-container {
-      position: relative;
-      width: 100%;
-      height: 380px;
-      background: #000;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 2px solid rgba(16, 185, 129, 0.4);
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
-      margin-bottom: 14px;
-    }
-    .scanner-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .scanner-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 14px;
-    }
-    .scanner-reticle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 200px;
-      height: 230px;
-      border: 2px dashed rgba(16, 185, 129, 0.7);
-      border-radius: 18px;
-      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.35);
-    }
-    .scanner-line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #10b981, transparent);
-      box-shadow: 0 0 12px #10b981;
-      animation: scanLaser 2s infinite ease-in-out;
-    }
-    @keyframes scanLaser {
-      0% { top: 6%; opacity: 0; }
-      15% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { top: 94%; opacity: 0; }
-    }
-    .scanner-badge {
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .scanner-status-text {
-      align-self: center;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      color: #fff;
-      font-weight: 600;
-      border: 1px solid var(--border-dark);
-      text-align: center;
-      max-width: 90%;
-    }
-    .scanner-controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .scanner-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid var(--border-dark);
-      background: var(--surface-dark);
-      color: var(--text-main);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .scanner-btn:active {
-      transform: scale(0.98);
-    }
-    .scanner-btn.active {
-      background: var(--accent-green);
-      color: #000;
-      border-color: var(--accent-green);
+    .nav-icon {
+      font-size: 20px;
     }
   </style>
 </head>
@@ -589,39 +626,69 @@
   <!-- Top Bar -->
   <header class="top-bar">
     <div class="top-bar-title">
-      <div class="shield-badge">🛡️</div>
+      <div class="shield-badge">
+        <!-- Heroicon: shield-check -->
+        <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+        </svg>
+      </div>
       <div>
         <h1>GATE GUARD COCKPIT</h1>
         <p>Gate 1 • Visitor Entry & Camera AI</p>
       </div>
     </div>
     <button class="top-btn" id="btnSimulate">
-      <span>📹</span> Test Camera Match
+      <!-- Heroicon: video-camera -->
+      <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+      </svg>
+      Check Camera
     </button>
   </header>
 
   <!-- View 1: Dashboard -->
   <main class="content" id="viewDashboard">
     <!-- Camera Live Banner -->
-    <div class="camera-banner">
+    <div class="camera-banner" id="cameraBanner">
       <div class="camera-status">
-        <div class="pulse-dot"></div>
+        <div class="pulse-dot-wrapper" style="background:#F1F5F9;" id="cameraDotWrapper">
+          <div class="pulse-dot" style="background:#94A3B8; box-shadow:none; animation:none;" id="cameraDot"></div>
+        </div>
         <div>
-          <h4>CCTV & ANPR AI Active</h4>
-          <p>Gate 1 Stream • Auto-alert enabled</p>
+          <h4 id="cameraTitle">No Camera Connected</h4>
+          <p id="cameraSub">Gate 1 Stream Offline • Connect camera to enable auto-match</p>
         </div>
       </div>
-      <span style="font-size: 11px; color: var(--accent-green); font-weight: 700;">LIVE</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span id="cameraBadge" style="font-size: 11px; color: var(--text-secondary); font-weight: 800; background: #F1F5F9; padding: 4px 8px; border-radius: 6px;">OFFLINE</span>
+        <button id="btnCameraToggle" onclick="toggleCameraConnection()" style="background:var(--green-light); color:var(--accent-green); border:1px solid rgba(0,128,0,0.3); padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer;">Connect</button>
+      </div>
     </div>
 
     <!-- KPI Grid -->
     <div class="kpi-grid">
       <div class="kpi-card" onclick="showActiveView()">
-        <div class="val" style="color: var(--accent-green);" id="activeCount">2</div>
+        <div class="kpi-header">
+          <div class="kpi-icon-pill" style="background: var(--green-light); color: var(--accent-green);">
+            <!-- Heroicon: user-group -->
+            <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.999-3.199a6.012 6.012 0 0 1-.94-3.198m12-5.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+          </div>
+          <div class="val" style="color: var(--accent-green);" id="activeCount">2</div>
+        </div>
         <div class="label">Active Inside</div>
       </div>
       <div class="kpi-card" onclick="showHistoryView()">
-        <div class="val" style="color: var(--accent-amber);" id="frequentCount">2</div>
+        <div class="kpi-header">
+          <div class="kpi-icon-pill" style="background: var(--amber-light); color: var(--accent-amber);">
+            <!-- Heroicon: sparkles -->
+            <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+            </svg>
+          </div>
+          <div class="val" style="color: var(--accent-amber);" id="frequentCount">2</div>
+        </div>
         <div class="label">Frequent Visitors</div>
       </div>
     </div>
@@ -630,39 +697,36 @@
     <div class="section-title">GUARD ACTIONS</div>
 
     <div class="big-btn" onclick="showEntryForm()">
-      <div class="big-btn-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green);">
-        ➕
+      <div class="big-btn-icon" style="background: var(--green-light); color: var(--accent-green);">
+        <!-- Heroicon: user-plus -->
+        <svg class="hero-icon-lg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.765Z" />
+        </svg>
       </div>
       <div style="flex:1;">
         <div class="big-btn-title">New Visitor Entry</div>
         <div class="big-btn-subtitle">Enter phone, vehicle & generate pass</div>
       </div>
-      <span style="color: var(--text-muted);">❯</span>
+      <!-- Heroicon: chevron-right -->
+      <svg class="hero-icon-sm" style="color: var(--text-muted);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
     </div>
 
     <div class="big-btn" onclick="showEntryForm(true)">
-      <div class="big-btn-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">
-        🔍
+      <div class="big-btn-icon" style="background: var(--blue-light); color: var(--accent-blue);">
+        <!-- Heroicon: magnifying-glass -->
+        <svg class="hero-icon-lg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
       </div>
       <div style="flex:1;">
         <div class="big-btn-title">Check Returning Visitor</div>
         <div class="big-btn-subtitle">Fetch history by phone or license plate</div>
       </div>
-      <span style="color: var(--text-muted);">❯</span>
-    </div>
-
-    <div class="big-btn" onclick="showScannerView()" style="border: 2px solid rgba(16, 185, 129, 0.5); background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(17, 24, 39, 0.9));">
-      <div class="big-btn-icon" style="background: rgba(16, 185, 129, 0.25); color: var(--accent-green); font-size: 26px;">
-        📷
-      </div>
-      <div style="flex:1;">
-        <div class="big-btn-title" style="color: var(--accent-green); display: flex; align-items: center; gap: 6px;">
-          <span>Open Mobile Entry Camera</span>
-          <span style="font-size: 9px; font-weight: 800; background: var(--accent-green); color: #000; padding: 1px 5px; border-radius: 4px;">LIVE AI</span>
-        </div>
-        <div class="big-btn-subtitle">Scan & recognize visitors live via phone camera (InsightFace)</div>
-      </div>
-      <span style="color: var(--accent-green); font-weight: 800;">START ❯</span>
+      <svg class="hero-icon-sm" style="color: var(--text-muted);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
     </div>
 
     <div class="big-btn" onclick="triggerCameraPopup(null, 'face')">
@@ -670,16 +734,29 @@
         👤
       </div>
       <div style="flex:1;">
-        <div class="big-btn-title">InsightFace AI Match Simulation</div>
-        <div class="big-btn-subtitle">Test popup alert for enrolled visitor face (ArcFace 512-d)</div>
+        <div class="big-btn-title">InsightFace AI Match Alert</div>
+        <div class="big-btn-subtitle">Simulate face camera recognition match (ArcFace 512-d)</div>
       </div>
       <span style="color: var(--text-muted);">❯</span>
     </div>
 
+    <div class="big-btn" onclick="triggerCameraPopup(null, 'plate')">
+      <div class="big-btn-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">
+        🚗
+      </div>
+      <div style="flex:1;">
+        <div class="big-btn-title">ANPR Plate Camera Match Alert</div>
+        <div class="big-btn-subtitle">Simulate license plate recognition match (TN19BE2844)</div>
+      </div>
+      <svg class="hero-icon-sm" style="color: var(--text-muted);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    </div>
+
     <!-- Active Visitors List -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 22px 0 12px;">
       <div class="section-title" style="margin-bottom:0;">CURRENTLY INSIDE PREMISES</div>
-      <a href="javascript:showActiveView()" style="color: var(--accent-green); font-size: 12px; text-decoration: none; font-weight: 700;">View All</a>
+      <a href="javascript:showActiveView()" style="color: var(--accent-green); font-size: 12px; text-decoration: none; font-weight: 800;">View All</a>
     </div>
 
     <div id="activeListContainer"></div>
@@ -688,32 +765,39 @@
   <!-- View 2: Visitor Entry Screen -->
   <main class="content view-screen" id="viewEntry">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-      <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
-      <h2 style="font-size: 16px; font-weight: 800;">VISITOR REGISTRATION & ENTRY</h2>
+      <button onclick="showDashboard()" style="background: var(--surface-white); border: 1px solid var(--border-light); width: 34px; height: 34px; border-radius: 8px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <h2 style="font-size: 15px; font-weight: 800; color: var(--text-main);">VISITOR REGISTRATION & ENTRY</h2>
     </div>
 
     <!-- Smart Returning Visitor Search -->
     <div class="search-box-card">
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--accent-blue); font-size: 12px; font-weight: 800;">
-        <span>🔍</span> RETURNING VISITOR LOOKUP
+        <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        RETURNING VISITOR LOOKUP
       </div>
       <input type="text" id="lookupInput" class="form-control" placeholder="Type phone, last 4 digits, or vehicle plate..." oninput="handleLookup(this.value)">
     </div>
 
-    <!-- Returning Visitor Banner (hidden initially) -->
+    <!-- Returning Visitor Banner -->
     <div class="returning-banner" id="returningBanner" style="display: none;">
       <div>
         <div style="color: var(--accent-amber); font-size: 11px; font-weight: 800;" id="bannerVisitsText">RETURNING VISITOR DETECTED</div>
-        <div style="font-size: 14px; font-weight: 700;" id="bannerName">SARAVANAN S</div>
-        <div style="font-size: 11px; color: var(--text-muted);" id="bannerSub">Plate: TN19BE2844</div>
+        <div style="font-size: 14px; font-weight: 800; color: var(--text-main);" id="bannerName">SARAVANAN S</div>
+        <div style="font-size: 11px; color: var(--text-secondary);" id="bannerSub">Plate: TN19BE2844</div>
       </div>
-      <button onclick="confirmReturningEntry()" style="background: var(--accent-amber); color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;">
+      <button onclick="confirmReturningEntry()" style="background: var(--accent-amber); color: #FFFFFF; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;">
         1-Tap Check-In
       </button>
     </div>
 
     <!-- Registration Form -->
-    <div style="background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 18px;">
+    <div style="background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 16px; padding: 18px; box-shadow: var(--shadow-soft);">
       <div class="form-group">
         <label>Full Name *</label>
         <input type="text" id="formName" class="form-control" placeholder="Visitor Name">
@@ -745,7 +829,10 @@
         <input type="text" id="formNotes" class="form-control" placeholder="Meeting / Inspection">
       </div>
 
-      <button id="btnSubmitVisitor" onclick="submitNewVisitor()" style="width: 100%; padding: 16px; background: var(--accent-green); color: #000; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; margin-top: 10px;">
+      <button id="btnSubmitVisitor" onclick="submitNewVisitor()" style="width: 100%; padding: 16px; background: var(--accent-green); color: #FFFFFF; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 128, 0, 0.25);">
+        <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
         CONFIRM & GRANT ENTRY PASS
       </button>
     </div>
@@ -829,8 +916,12 @@
   <!-- View 4: Active Visitors Inside -->
   <main class="content view-screen" id="viewActive">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-      <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
-      <h2 style="font-size: 16px; font-weight: 800;">CURRENTLY INSIDE PREMISES</h2>
+      <button onclick="showDashboard()" style="background: var(--surface-white); border: 1px solid var(--border-light); width: 34px; height: 34px; border-radius: 8px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <h2 style="font-size: 15px; font-weight: 800; color: var(--text-main);">CURRENTLY INSIDE PREMISES</h2>
     </div>
     <div id="fullActiveList"></div>
   </main>
@@ -838,16 +929,23 @@
   <!-- View 5: Frequent Visitors -->
   <main class="content view-screen" id="viewHistory">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-      <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
-      <h2 style="font-size: 16px; font-weight: 800;">FREQUENT & RETURNING VISITORS</h2>
+      <button onclick="showDashboard()" style="background: var(--surface-white); border: 1px solid var(--border-light); width: 34px; height: 34px; border-radius: 8px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <h2 style="font-size: 15px; font-weight: 800; color: var(--text-main);">FREQUENT & RETURNING VISITORS</h2>
     </div>
     <div id="frequentListContainer"></div>
   </main>
 
-  <!-- Bottom Navigation -->
+  <!-- Bottom Navigation with Heroicons -->
   <nav class="bottom-nav">
     <div class="nav-item active" id="navDash" onclick="showDashboard()">
-      <span class="nav-icon">📊</span>
+      <!-- Heroicon: squares-2x2 -->
+      <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+      </svg>
       <span>Cockpit</span>
     </div>
     <div class="nav-item" id="navScanner" onclick="showScannerView()">
@@ -855,15 +953,24 @@
       <span>Scanner</span>
     </div>
     <div class="nav-item" id="navEntry" onclick="showEntryForm()">
-      <span class="nav-icon">➕</span>
+      <!-- Heroicon: user-plus -->
+      <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.765Z" />
+      </svg>
       <span>Check-In</span>
     </div>
     <div class="nav-item" id="navActive" onclick="showActiveView()">
-      <span class="nav-icon">👥</span>
+      <!-- Heroicon: user-group -->
+      <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.999-3.199a6.012 6.012 0 0 1-.94-3.198m12-5.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 7.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
       <span>Inside</span>
     </div>
     <div class="nav-item" id="navHistory" onclick="showHistoryView()">
-      <span class="nav-icon">⭐</span>
+      <!-- Heroicon: sparkles -->
+      <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+      </svg>
       <span>Frequent</span>
     </div>
   </nav>
@@ -872,7 +979,12 @@
   <div class="modal-overlay" id="cameraModal">
     <div class="modal-box">
       <div class="alert-header">
-        <div class="alert-icon">⭐</div>
+        <div class="alert-icon">
+          <!-- Heroicon: sparkles -->
+          <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+          </svg>
+        </div>
         <div style="flex:1;">
           <h3>FREQUENT VISITOR DETECTED</h3>
           <p>Gate 1 (Visitor Access Lane) • ANPR Camera Match</p>
@@ -881,37 +993,93 @@
       </div>
 
       <div class="alert-profile">
-        <div class="visitor-avatar" style="width:52px; height:52px; background:var(--accent-amber); color:#000; font-size:22px;" id="modalAvatar">S</div>
+        <div class="visitor-avatar" style="width:52px; height:52px; background:var(--green-light); color:var(--accent-green); font-size:22px;" id="modalAvatar">S</div>
         <div>
-          <div style="font-size: 16px; font-weight: 800;" id="modalName">SARAVANAN S</div>
+          <div style="font-size: 16px; font-weight: 800; font-family:'Roboto', sans-serif; color:var(--text-main);" id="modalName">SARAVANAN S</div>
           <div style="font-size: 12px; color: var(--accent-blue); font-weight: 700;" id="modalCode">VIS-10002</div>
-          <div style="font-size: 12px; color: var(--text-muted);" id="modalCompany">EcoTech Innovations</div>
+          <div style="font-size: 12px; color: var(--text-secondary);" id="modalCompany">EcoTech Innovations</div>
         </div>
       </div>
 
       <div class="alert-details">
         <div class="alert-row">
-          <span style="color:var(--text-muted);">Vehicle Plate</span>
+          <span style="color:var(--text-secondary); font-weight:600;">Vehicle Plate</span>
           <span class="plate-badge" id="modalPlate">TN19BE2844</span>
         </div>
         <div class="alert-row">
-          <span style="color:var(--text-muted);">Total Previous Visits</span>
-          <span style="color:var(--accent-amber); font-weight:700;" id="modalVisits">3 Visits (Frequent Visitor)</span>
+          <span style="color:var(--text-secondary); font-weight:600;">Total Previous Visits</span>
+          <span style="color:var(--accent-amber); font-weight:800;" id="modalVisits">3 Visits (Frequent Visitor)</span>
         </div>
         <div class="alert-row">
-          <span style="color:var(--text-muted);">Match Confidence</span>
-          <span style="color:var(--accent-green); font-weight:700;">97.8% (ANPR Consensus)</span>
+          <span style="color:var(--text-secondary); font-weight:600;">Match Confidence</span>
+          <span style="color:var(--accent-green); font-weight:800;">97.8% (ANPR Consensus)</span>
         </div>
         <div class="alert-row">
-          <span style="color:var(--text-muted);">Phone Number</span>
-          <span style="color:var(--text-main);" id="modalPhone">07010783677</span>
+          <span style="color:var(--text-secondary); font-weight:600;">Phone Number</span>
+          <span style="color:var(--text-main); font-weight:700;" id="modalPhone">07010783677</span>
         </div>
       </div>
 
       <div class="modal-actions">
         <button class="btn-dismiss" onclick="closeModal()">Dismiss</button>
         <button class="btn-confirm" onclick="confirmModalEntry()">
-          <span>✓</span> Confirm Entry
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+          </svg>
+          Confirm Entry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Hardware Status Diagnostics Modal -->
+  <div class="modal-overlay" id="cameraStatusModal">
+    <div class="modal-box" style="border-color: var(--border-light); max-width: 420px;">
+      <div class="alert-header">
+        <div class="alert-icon" style="background:#F1F5F9; color:var(--text-secondary); border-color:var(--border-light);">
+          <svg class="hero-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <div style="flex:1;">
+          <h3 style="color:var(--text-main);">CAMERA DEVICE STATUS</h3>
+          <p>Gate 1 Recognition Diagnostics</p>
+        </div>
+        <button onclick="closeCameraStatusModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding:16px; background:var(--bg-page); border:1px solid var(--border-light); border-radius:14px; margin-bottom:16px; text-align:center;">
+        <div style="width:48px; height:48px; border-radius:50%; background:#F1F5F9; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; color:var(--text-muted);">
+          <svg class="hero-icon-lg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <div style="font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:4px;" id="statusModalTitle">No Camera Connected</div>
+        <div style="font-size:12px; color:var(--text-secondary);" id="statusModalDesc">No live CCTV, USB webcam, or RTSP video feed is active on Gate 1.</div>
+      </div>
+
+      <div class="alert-details" style="margin-bottom:18px;">
+        <div class="alert-row">
+          <span style="color:var(--text-secondary); font-weight:600;">Hardware Cameras</span>
+          <span style="font-weight:700; color:var(--text-secondary);" id="statusDeviceCount">0 Detected</span>
+        </div>
+        <div class="alert-row">
+          <span style="color:var(--text-secondary); font-weight:600;">Face Recognition Feed</span>
+          <span style="font-weight:700; color:#DC2626;" id="statusFaceFeed">Offline</span>
+        </div>
+        <div class="alert-row">
+          <span style="color:var(--text-secondary); font-weight:600;">ANPR Plate Lane</span>
+          <span style="font-weight:700; color:#DC2626;" id="statusPlateFeed">Offline</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-dismiss" onclick="closeCameraStatusModal()">Close</button>
+        <button class="btn-confirm" id="btnModalScan" onclick="checkCameraHardware(true)" style="background:var(--accent-green); color:#FFFFFF;">
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          Scan for Cameras
         </button>
       </div>
     </div>
@@ -988,7 +1156,15 @@
     listEl.innerHTML = '';
 
     if (active.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">No visitors currently checked-in inside.</div>';
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:28px 16px; background:var(--surface-white); border:1px solid var(--border-light); border-radius:14px; color:var(--text-secondary); font-size:13px; font-weight:600;">
+          <div style="color:var(--accent-green); margin-bottom:6px;">
+            <svg class="hero-icon-lg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </div>
+          No visitors currently checked-in inside.
+        </div>`;
       return;
     }
 
@@ -1000,11 +1176,16 @@
         <div class="visitor-info">
           <div class="visitor-name-row">
             <span class="visitor-name">${v.full_name}</span>
-            ${(v.total_visits || 0) >= 2 ? `<span class="frequent-tag">${v.total_visits} visits</span>` : ''}
+            ${(v.total_visits || 0) >= 2 ? `<span class="frequent-tag"><svg class="hero-icon-sm" style="width:10px;height:10px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>${v.total_visits} visits</span>` : ''}
           </div>
           <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
         </div>
-        <button class="btn-checkout" onclick="checkOutVisitor(${v.id})">Check Out</button>
+        <button class="btn-checkout" onclick="checkOutVisitor(${v.id})">
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+          Check Out
+        </button>
       `;
       listEl.appendChild(card);
     });
@@ -1051,7 +1232,7 @@
         if (list.length > 0) {
           matchedReturning = list[0];
           document.getElementById('bannerName').innerText = matchedReturning.full_name;
-          document.getElementById('bannerVisitsText').innerText = `⭐ RETURNING VISITOR FOUND (${matchedReturning.total_visits || 1} PREVIOUS VISITS)`;
+          document.getElementById('bannerVisitsText').innerText = `RETURNING VISITOR FOUND (${matchedReturning.total_visits || 1} PREVIOUS VISITS)`;
           document.getElementById('bannerSub').innerText = `Code: ${matchedReturning.visitor_code} • Plate: ${matchedReturning.vehicle_number || 'None'} • Company: ${matchedReturning.company || 'N/A'}`;
           banner.style.display = 'flex';
 
@@ -1147,8 +1328,150 @@
     }
   }
 
-  // Camera Match Pop-up Alert
+  // Camera Connection State (default false: no camera hardware connected)
+  let isCameraConnected = false;
+
+  function updateCameraUI() {
+    const dot = document.getElementById('cameraDot');
+    const dotWrapper = document.getElementById('cameraDotWrapper');
+    const title = document.getElementById('cameraTitle');
+    const sub = document.getElementById('cameraSub');
+    const badge = document.getElementById('cameraBadge');
+    const btn = document.getElementById('btnCameraToggle');
+    const topBtn = document.getElementById('btnSimulate');
+
+    if (!isCameraConnected) {
+      if (dot) {
+        dot.style.background = '#94A3B8';
+        dot.style.boxShadow = 'none';
+        dot.style.animation = 'none';
+      }
+      if (dotWrapper) dotWrapper.style.background = '#F1F5F9';
+      if (title) title.innerText = 'No Camera Connected';
+      if (sub) sub.innerText = 'Gate 1 Stream Offline • Connect camera to enable auto-match';
+      if (badge) {
+        badge.innerText = 'OFFLINE';
+        badge.style.color = 'var(--text-secondary)';
+        badge.style.background = '#F1F5F9';
+      }
+      if (btn) {
+        btn.innerText = 'Connect';
+        btn.style.background = 'var(--green-light)';
+        btn.style.color = 'var(--accent-green)';
+      }
+      if (topBtn) {
+        topBtn.innerHTML = `
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+          Check Camera
+        `;
+      }
+    } else {
+      if (dot) {
+        dot.style.background = 'var(--accent-green)';
+        dot.style.boxShadow = '0 0 8px rgba(0, 128, 0, 0.6)';
+        dot.style.animation = 'pulse 1.8s infinite';
+      }
+      if (dotWrapper) dotWrapper.style.background = 'var(--green-light)';
+      if (title) title.innerText = 'CCTV & ANPR AI Active';
+      if (sub) sub.innerText = 'Gate 1 Stream • Auto-alert enabled';
+      if (badge) {
+        badge.innerText = 'LIVE';
+        badge.style.color = 'var(--accent-green)';
+        badge.style.background = 'var(--green-light)';
+      }
+      if (btn) {
+        btn.innerText = 'Disconnect';
+        btn.style.background = 'var(--red-light)';
+        btn.style.color = 'var(--accent-red)';
+      }
+      if (topBtn) {
+        topBtn.innerHTML = `
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+          Gate Camera Active
+        `;
+      }
+    }
+  }
+
+  function showCameraStatusModal(deviceCount = 0) {
+    document.getElementById('statusDeviceCount').innerText = `${deviceCount} Detected`;
+    if (deviceCount === 0) {
+      document.getElementById('statusModalTitle').innerText = 'No Camera Connected';
+      document.getElementById('statusModalDesc').innerText = 'No live CCTV, USB webcam, or RTSP video feed is active on Gate 1. Connect a camera feed to start detection.';
+      document.getElementById('statusFaceFeed').innerText = 'Offline';
+      document.getElementById('statusFaceFeed').style.color = '#DC2626';
+      document.getElementById('statusPlateFeed').innerText = 'Offline';
+      document.getElementById('statusPlateFeed').style.color = '#DC2626';
+    } else {
+      document.getElementById('statusModalTitle').innerText = 'Camera Feed Active';
+      document.getElementById('statusModalDesc').innerText = `${deviceCount} video input stream(s) connected and streaming.`;
+      document.getElementById('statusFaceFeed').innerText = 'Active (InsightFace)';
+      document.getElementById('statusFaceFeed').style.color = 'var(--accent-green)';
+      document.getElementById('statusPlateFeed').innerText = 'Active (ANPR)';
+      document.getElementById('statusPlateFeed').style.color = 'var(--accent-green)';
+    }
+    document.getElementById('cameraStatusModal').style.display = 'flex';
+  }
+
+  function closeCameraStatusModal() {
+    document.getElementById('cameraStatusModal').style.display = 'none';
+  }
+
+  async function checkCameraHardware(promptUser = true) {
+    let videoCount = 0;
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(d => d.kind === 'videoinput');
+        videoCount = videoInputs.length;
+      }
+    } catch (_) {}
+
+    try {
+      const res = await fetch(`${API_BASE}/api/v2/cameras`, { headers: getHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        const enabledCams = (data.cameras || []).filter(c => c.enabled);
+        if (enabledCams.length > 0) videoCount += enabledCams.length;
+      }
+    } catch (_) {}
+
+    if (videoCount > 0) {
+      isCameraConnected = true;
+      updateCameraUI();
+      if (promptUser) {
+        showCameraStatusModal(videoCount);
+      }
+    } else {
+      isCameraConnected = false;
+      updateCameraUI();
+      if (promptUser) {
+        showCameraStatusModal(0);
+      }
+    }
+  }
+
+  function toggleCameraConnection() {
+    if (isCameraConnected) {
+      isCameraConnected = false;
+      updateCameraUI();
+      closeModal();
+      showCameraStatusModal(0);
+    } else {
+      checkCameraHardware(true);
+    }
+  }
+
+  // Camera Match Pop-up Alert (ONLY shows if a camera is actually connected!)
   function triggerCameraPopup(visitor, mode = 'face') {
+    if (!isCameraConnected) {
+      showCameraStatusModal(0);
+      return;
+    }
     const target = visitor || currentVisitors.find(v => v.id === 2) || currentVisitors[0] || {
       id: 2, full_name: 'SARAVANAN S', visitor_code: 'VIS-10002', total_visits: 3, vehicle_number: 'TN19BE2844', company: 'EcoTech Innovations', phone_number: '07010783677'
     };
@@ -1413,23 +1736,28 @@
     listEl.innerHTML = '';
     const active = currentVisitors.filter(v => v.is_present);
     if (active.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No visitors currently inside.</div>';
+      listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary); font-weight:600;">No visitors currently inside.</div>';
       return;
     }
     active.forEach(v => {
       const card = document.createElement('div');
       card.className = 'visitor-card';
       card.innerHTML = `
-        <div class="visitor-avatar">${v.full_name[0]}</div>
+        <div class="visitor-avatar">${v.full_name ? v.full_name[0].toUpperCase() : 'V'}</div>
         <div class="visitor-info">
           <div class="visitor-name-row">
             <span class="visitor-name">${v.full_name}</span>
-            ${v.total_visits >= 2 ? `<span class="frequent-tag">${v.total_visits} visits</span>` : ''}
+            ${(v.total_visits || 0) >= 2 ? `<span class="frequent-tag"><svg class="hero-icon-sm" style="width:10px;height:10px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>${v.total_visits} visits</span>` : ''}
           </div>
           <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
-          ${v.company ? `<div style="font-size:11px; color:var(--text-muted);">${v.company}</div>` : ''}
+          ${v.company ? `<div style="font-size:11px; color:var(--text-muted); font-weight:600;">${v.company}</div>` : ''}
         </div>
-        <button class="btn-checkout" onclick="checkOutVisitor(${v.id})">Check Out</button>
+        <button class="btn-checkout" onclick="checkOutVisitor(${v.id})">
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+          Check Out
+        </button>
       `;
       listEl.appendChild(card);
     });
@@ -1445,22 +1773,29 @@
   function renderFrequentList() {
     const listEl = document.getElementById('frequentListContainer');
     listEl.innerHTML = '';
-    const frequent = currentVisitors.filter(v => v.total_visits >= 2);
+    const frequent = currentVisitors.filter(v => (v.total_visits || 0) >= 2);
+    if (frequent.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary); font-weight:600;">No frequent visitor records found.</div>';
+      return;
+    }
     frequent.forEach(v => {
       const card = document.createElement('div');
       card.className = 'visitor-card';
-      card.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      card.style.borderColor = 'rgba(217, 119, 6, 0.4)';
       card.innerHTML = `
-        <div class="visitor-avatar" style="color:var(--accent-amber); font-weight:800;">${v.full_name[0]}</div>
+        <div class="visitor-avatar" style="background:var(--amber-light); color:var(--accent-amber); font-weight:800;">${v.full_name ? v.full_name[0].toUpperCase() : 'V'}</div>
         <div class="visitor-info">
           <div class="visitor-name-row">
             <span class="visitor-name">${v.full_name}</span>
-            <span class="frequent-tag">${v.total_visits} visits</span>
+            <span class="frequent-tag"><svg class="hero-icon-sm" style="width:10px;height:10px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>${v.total_visits} visits</span>
           </div>
           <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
-          <div style="font-size:11px; color:var(--text-muted);">Phone: ${v.phone_number || 'N/A'}</div>
+          <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Phone: ${v.phone_number || 'N/A'}</div>
         </div>
-        <button onclick="triggerCameraPopup(currentVisitors.find(x => x.id === ${v.id}))" style="background:var(--card-dark); color:var(--accent-amber); border:1px solid rgba(245, 158, 11, 0.4); padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">
+        <button onclick="triggerCameraPopup(currentVisitors.find(x => x.id === ${v.id}))" style="background:var(--green-light); color:var(--accent-green); border:1px solid rgba(0, 128, 0, 0.3); padding:7px 12px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items: center; gap: 4px;">
+          <svg class="hero-icon-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
           Test Match
         </button>
       `;
@@ -1468,7 +1803,12 @@
     });
   }
 
-  document.getElementById('btnSimulate').addEventListener('click', () => triggerCameraPopup());
+  document.getElementById('btnSimulate').addEventListener('click', () => {
+    checkCameraHardware(true);
+  });
+
+  // Initialize camera state UI as disconnected
+  updateCameraUI();
 
   // Initial load from live backend database
   loadLiveVisitors();

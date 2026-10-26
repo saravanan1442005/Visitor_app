@@ -12,18 +12,61 @@ class AppConstants {
   static const String keyGuardName = 'pref_guard_name';
   static const String keyGateName = 'pref_gate_name';
   
-  // App Colors
-  static const Color primaryDark = Color(0xFF0F172A); // Slate 900
-  static const Color surfaceDark = Color(0xFF1E293B); // Slate 800
-  static const Color cardDark = Color(0xFF334155);    // Slate 700
-  static const Color accentGreen = Color(0xFF10B981); // Emerald 500
-  static const Color accentAmber = Color(0xFFF59E0B); // Amber 500 (Alert)
-  static const Color accentRed = Color(0xFFEF4444);   // Rose 500
-  static const Color accentBlue = Color(0xFF38BDF8);  // Sky 400
+  // Brand Colors - Clean White & #008000 Green Light Theme
+  static const Color accentGreen = Color(0xFF008000);       // User requested #008000
+  static const Color greenDark = Color(0xFF006400);          // Darker green for pressed states
+  static const Color greenLight = Color(0xFFE8F5E9);         // Soft green badge background
+  static const Color greenSubtle = Color(0xFFF0FDF4);        // Very light green tint
+
+  static const Color scaffoldLight = Color(0xFFF8FAFC);      // Crisp clean background
+  static const Color surfaceWhite = Color(0xFFFFFFFF);       // Pure White surfaces
+  static const Color cardLight = Color(0xFFFFFFFF);          // White cards
+  static const Color inputFill = Color(0xFFF8FAFC);          // Subtle light fill for inputs
+  static const Color chipBackground = Color(0xFFF1F5F9);     // Slate 100
+
+  // Neutral Text Colors
+  static const Color textPrimary = Color(0xFF0F172A);        // Slate 900
+  static const Color textSecondary = Color(0xFF475569);      // Slate 600
+  static const Color textMuted = Color(0xFF94A3B8);          // Slate 400
   
-  static const Color textPrimary = Color(0xFFF8FAFC);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color borderLight = Color(0xFF475569);
+  // Borders & Dividers
+  static const Color borderLight = Color(0xFFE2E8F0);        // Slate 200
+  static const Color borderMedium = Color(0xFFCBD5E1);       // Slate 300
+
+  // Status / Functional Colors
+  static const Color accentAmber = Color(0xFFD97706);        // Amber 600
+  static const Color amberLight = Color(0xFFFEF3C7);         // Amber 100
+  static const Color accentRed = Color(0xFFDC2626);          // Red 600
+  static const Color redLight = Color(0xFFFEE2E2);           // Red 100
+  static const Color accentBlue = Color(0xFF0284C7);         // Sky 600
+  static const Color blueLight = Color(0xFFE0F2FE);          // Sky 100
+
+  // Backwards compatibility aliases mapped to light theme
+  static const Color primaryDark = scaffoldLight;
+  static const Color surfaceDark = surfaceWhite;
+  static const Color cardDark = chipBackground;
+
+  // Soft modern drop shadow for cards and surfaces
+  static List<BoxShadow> get softShadow => [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.04),
+      blurRadius: 10,
+      offset: const Offset(0, 3),
+    ),
+    BoxShadow(
+      color: const Color(0xFF008000).withValues(alpha: 0.02),
+      blurRadius: 16,
+      offset: const Offset(0, 6),
+    ),
+  ];
+
+  static List<BoxShadow> get greenGlow => [
+    BoxShadow(
+      color: const Color(0xFF008000).withValues(alpha: 0.20),
+      blurRadius: 12,
+      offset: const Offset(0, 4),
+    ),
+  ];
 
   // Categories
   static const List<String> visitorCategories = [

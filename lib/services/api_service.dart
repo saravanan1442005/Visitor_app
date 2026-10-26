@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/constants.dart';
 import '../models/visitor.dart';
-import '../models/visitor_entry.dart';
 import '../models/camera_match_event.dart';
 
 class ApiService extends ChangeNotifier {
@@ -261,7 +260,7 @@ class ApiService extends ChangeNotifier {
       cameraName: 'Gate 1 (Visitor Access)',
       gateLocation: 'North Gate - Vehicle Entry Lane',
       confidence: 0.978,
-      matchType: 'ANPR Plate Match (TN19BE2844)',
+      matchType: 'Match (TN19BE2844)',
       timestamp: DateTime.now(),
       isFrequentVisitor: true,
     );
