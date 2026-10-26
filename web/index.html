@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gate Security Guard — Visitor Cockpit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --surface-dark: #111827;
+      --card-dark: #1f2937;
+      --border-dark: #374151;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-blue: #38bdf8;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .mobile-frame {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      border-left: 1px solid rgba(255, 255, 255, 0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    /* Top Bar */
+    .top-bar {
+      padding: 16px 20px;
+      background: rgba(17, 24, 39, 0.9);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid var(--border-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top-bar-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .shield-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-green);
+      font-size: 20px;
+    }
+    .top-bar h1 {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: var(--text-main);
+    }
+    .top-bar p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .top-btn {
+      background: var(--card-dark);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .top-btn:active {
+      transform: scale(0.96);
+    }
+    /* Content Area */
+    .content {
+      padding: 18px 20px 90px;
+      flex: 1;
+    }
+    /* Live Camera Bar */
+    .camera-banner {
+      background: var(--surface-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .camera-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .camera-status h4 {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .camera-status p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    /* KPI Stats */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+    }
+    .kpi-card .val {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .kpi-card .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    /* Action Buttons */
+    .section-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .big-btn {
+      width: 100%;
+      background: var(--surface-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .big-btn:hover, .big-btn:active {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    .big-btn-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .big-btn-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+    .big-btn-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    /* Visitor List Items */
+    .visitor-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .visitor-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .visitor-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .visitor-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .visitor-name {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .frequent-tag {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .visitor-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .btn-checkout {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--accent-red);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    /* Modal Pop-up */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.25s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-box {
+      background: var(--surface-dark);
+      border-radius: 20px;
+      border: 2px solid var(--accent-amber);
+      box-shadow: 0 0 50px rgba(245, 158, 11, 0.35);
+      width: 100%;
+      max-width: 420px;
+      padding: 22px;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .alert-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .alert-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-amber);
+      font-size: 22px;
+    }
+    .alert-header h3 {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-amber);
+      letter-spacing: 0.8px;
+    }
+    .alert-header p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .alert-profile {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .alert-details {
+      background: var(--card-dark);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+    .alert-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      padding: 5px 0;
+    }
+    .alert-row:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .plate-badge {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: var(--accent-amber);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-dismiss {
+      flex: 1;
+      padding: 14px;
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      color: var(--text-muted);
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-confirm {
+      flex: 2;
+      padding: 14px;
+      background: var(--accent-green);
+      border: none;
+      color: #000;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    /* Entry Form View */
+    .view-screen {
+      display: none;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-control {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-dark);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    .search-box-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--accent-blue);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .returning-banner {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--accent-amber);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: sticky;
+      bottom: 0;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-dark);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 40;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .nav-item.active {
+      color: var(--accent-green);
+    }
+    .nav-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="mobile-frame">
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="top-bar-title">
+      <div class="shield-badge">🛡️</div>
+      <div>
+        <h1>GATE GUARD COCKPIT</h1>
+        <p>Gate 1 • Visitor Entry & Camera AI</p>
+      </div>
+    </div>
+    <button class="top-btn" id="btnSimulate">
+      <span>📹</span> Test Camera Match
+    </button>
+  </header>
+
+  <!-- View 1: Dashboard -->
+  <main class="content" id="viewDashboard">
+    <!-- Camera Live Banner -->
+    <div class="camera-banner">
+      <div class="camera-status">
+        <div class="pulse-dot"></div>
+        <div>
+          <h4>CCTV & ANPR AI Active</h4>
+          <p>Gate 1 Stream • Auto-alert enabled</p>
+        </div>
+      </div>
+      <span style="font-size: 11px; color: var(--accent-green); font-weight: 700;">LIVE</span>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card" onclick="showActiveView()">
+        <div class="val" style="color: var(--accent-green);" id="activeCount">2</div>
+        <div class="label">Active Inside</div>
+      </div>
+      <div class="kpi-card" onclick="showHistoryView()">
+        <div class="val" style="color: var(--accent-amber);" id="frequentCount">2</div>
+        <div class="label">Frequent Visitors</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-title">GUARD ACTIONS</div>
+
+    <div class="big-btn" onclick="showEntryForm()">
+      <div class="big-btn-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green);">
+        ➕
+      </div>
+      <div style="flex:1;">
+        <div class="big-btn-title">New Visitor Entry</div>
+        <div class="big-btn-subtitle">Enter phone, vehicle & generate pass</div>
+      </div>
+      <span style="color: var(--text-muted);">❯</span>
+    </div>
+
+    <div class="big-btn" onclick="showEntryForm(true)">
+      <div class="big-btn-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">
+        🔍
+      </div>
+      <div style="flex:1;">
+        <div class="big-btn-title">Check Returning Visitor</div>
+        <div class="big-btn-subtitle">Fetch history by phone or license plate</div>
+      </div>
+      <span style="color: var(--text-muted);">❯</span>
+    </div>
+
+    <div class="big-btn" onclick="triggerCameraPopup()">
+      <div class="big-btn-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">
+        🚨
+      </div>
+      <div style="flex:1;">
+        <div class="big-btn-title">Simulate Camera Match Alert</div>
+        <div class="big-btn-subtitle">Test popup notification for frequent visitor</div>
+      </div>
+      <span style="color: var(--text-muted);">❯</span>
+    </div>
+
+    <!-- Active Visitors List -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+      <div class="section-title" style="margin-bottom:0;">CURRENTLY INSIDE PREMISES</div>
+      <a href="javascript:showActiveView()" style="color: var(--accent-green); font-size: 12px; text-decoration: none; font-weight: 700;">View All</a>
+    </div>
+
+    <div id="activeListContainer"></div>
+  </main>
+
+  <!-- View 2: Visitor Entry Screen -->
+  <main class="content view-screen" id="viewEntry">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+      <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
+      <h2 style="font-size: 16px; font-weight: 800;">VISITOR REGISTRATION & ENTRY</h2>
+    </div>
+
+    <!-- Smart Returning Visitor Search -->
+    <div class="search-box-card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--accent-blue); font-size: 12px; font-weight: 800;">
+        <span>🔍</span> RETURNING VISITOR LOOKUP
+      </div>
+      <input type="text" id="lookupInput" class="form-control" placeholder="Type phone, last 4 digits, or vehicle plate..." oninput="handleLookup(this.value)">
+    </div>
+
+    <!-- Returning Visitor Banner (hidden initially) -->
+    <div class="returning-banner" id="returningBanner" style="display: none;">
+      <div>
+        <div style="color: var(--accent-amber); font-size: 11px; font-weight: 800;" id="bannerVisitsText">RETURNING VISITOR DETECTED</div>
+        <div style="font-size: 14px; font-weight: 700;" id="bannerName">SARAVANAN S</div>
+        <div style="font-size: 11px; color: var(--text-muted);" id="bannerSub">Plate: TN19BE2844</div>
+      </div>
+      <button onclick="confirmReturningEntry()" style="background: var(--accent-amber); color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;">
+        1-Tap Check-In
+      </button>
+    </div>
+
+    <!-- Registration Form -->
+    <div style="background: var(--surface-dark); border: 1px solid var(--border-dark); border-radius: 16px; padding: 18px;">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="formName" class="form-control" placeholder="Visitor Name">
+      </div>
+      <div class="form-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="formPhone" class="form-control" placeholder="e.g. 07010783677">
+      </div>
+      <div class="form-group">
+        <label>Vehicle Plate Number</label>
+        <input type="text" id="formPlate" class="form-control" placeholder="e.g. TN19BE2844" style="text-transform: uppercase;">
+      </div>
+      <div class="form-group">
+        <label>Company / Organization</label>
+        <input type="text" id="formCompany" class="form-control" placeholder="e.g. EcoTech / Visitor">
+      </div>
+      <div class="form-group">
+        <label>Visitor Category</label>
+        <select id="formCategory" class="form-control">
+          <option value="Guest">Guest / Visitor</option>
+          <option value="Official">Official / Business</option>
+          <option value="Delivery">Delivery / Courier</option>
+          <option value="Contractor">Contractor / Maintenance</option>
+          <option value="Vendor">Vendor / Supplier</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Purpose of Visit</label>
+        <input type="text" id="formNotes" class="form-control" placeholder="Meeting / Inspection">
+      </div>
+
+      <button id="btnSubmitVisitor" onclick="submitNewVisitor()" style="width: 100%; padding: 16px; background: var(--accent-green); color: #000; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; margin-top: 10px;">
+        CONFIRM & GRANT ENTRY PASS
+      </button>
+    </div>
+  </main>
+
+  <!-- View 3: Active Visitors Inside -->
+  <main class="content view-screen" id="viewActive">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+      <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
+      <h2 style="font-size: 16px; font-weight: 800;">CURRENTLY INSIDE PREMISES</h2>
+    </div>
+    <div id="fullActiveList"></div>
+  </main>
+
+  <!-- View 4: Frequent Visitors -->
+  <main class="content view-screen" id="viewHistory">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+      <button onclick="showDashboard()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">❮</button>
+      <h2 style="font-size: 16px; font-weight: 800;">FREQUENT & RETURNING VISITORS</h2>
+    </div>
+    <div id="frequentListContainer"></div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" id="navDash" onclick="showDashboard()">
+      <span class="nav-icon">📊</span>
+      <span>Cockpit</span>
+    </div>
+    <div class="nav-item" id="navEntry" onclick="showEntryForm()">
+      <span class="nav-icon">➕</span>
+      <span>Check-In</span>
+    </div>
+    <div class="nav-item" id="navActive" onclick="showActiveView()">
+      <span class="nav-icon">👥</span>
+      <span>Inside</span>
+    </div>
+    <div class="nav-item" id="navHistory" onclick="showHistoryView()">
+      <span class="nav-icon">⭐</span>
+      <span>Frequent</span>
+    </div>
+  </nav>
+
+  <!-- Frequent Visitor Camera Match Pop-up Modal -->
+  <div class="modal-overlay" id="cameraModal">
+    <div class="modal-box">
+      <div class="alert-header">
+        <div class="alert-icon">⭐</div>
+        <div style="flex:1;">
+          <h3>FREQUENT VISITOR DETECTED</h3>
+          <p>Gate 1 (Visitor Access Lane) • ANPR Camera Match</p>
+        </div>
+        <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+      </div>
+
+      <div class="alert-profile">
+        <div class="visitor-avatar" style="width:52px; height:52px; background:var(--accent-amber); color:#000; font-size:22px;" id="modalAvatar">S</div>
+        <div>
+          <div style="font-size: 16px; font-weight: 800;" id="modalName">SARAVANAN S</div>
+          <div style="font-size: 12px; color: var(--accent-blue); font-weight: 700;" id="modalCode">VIS-10002</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="modalCompany">EcoTech Innovations</div>
+        </div>
+      </div>
+
+      <div class="alert-details">
+        <div class="alert-row">
+          <span style="color:var(--text-muted);">Vehicle Plate</span>
+          <span class="plate-badge" id="modalPlate">TN19BE2844</span>
+        </div>
+        <div class="alert-row">
+          <span style="color:var(--text-muted);">Total Previous Visits</span>
+          <span style="color:var(--accent-amber); font-weight:700;" id="modalVisits">3 Visits (Frequent Visitor)</span>
+        </div>
+        <div class="alert-row">
+          <span style="color:var(--text-muted);">Match Confidence</span>
+          <span style="color:var(--accent-green); font-weight:700;">97.8% (ANPR Consensus)</span>
+        </div>
+        <div class="alert-row">
+          <span style="color:var(--text-muted);">Phone Number</span>
+          <span style="color:var(--text-main);" id="modalPhone">07010783677</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-dismiss" onclick="closeModal()">Dismiss</button>
+        <button class="btn-confirm" onclick="confirmModalEntry()">
+          <span>✓</span> Confirm Entry
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initial visitor data loaded directly from Supabase / Gate system
+  const mockVisitors = [
+    {
+      id: 2,
+      visitor_code: 'VIS-10002',
+      full_name: 'SARAVANAN S',
+      phone_number: '07010783677',
+      phone_last4: '3677',
+      vehicle_number: 'TN19BE2844',
+      company: 'EcoTech Innovations',
+      category: 'Official / Business',
+      total_visits: 3,
+      is_present: true
+    },
+    {
+      id: 1,
+      visitor_code: 'VIS-10001',
+      full_name: 'Test Gate Visitor',
+      phone_number: '9840123456',
+      phone_last4: '3456',
+      vehicle_number: 'TN01AB1234',
+      company: 'Alpha Logistics',
+      category: 'Delivery / Courier',
+      total_visits: 2,
+      is_present: true
+    }
+  ];
+
+  let currentVisitors = [...mockVisitors];
+  let matchedReturning = null;
+
+  function renderDashboard() {
+    const active = currentVisitors.filter(v => v.is_present);
+    const frequent = currentVisitors.filter(v => v.total_visits >= 2);
+
+    document.getElementById('activeCount').innerText = active.length;
+    document.getElementById('frequentCount').innerText = frequent.length;
+
+    const listEl = document.getElementById('activeListContainer');
+    listEl.innerHTML = '';
+
+    if (active.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">No visitors currently checked-in inside.</div>';
+      return;
+    }
+
+    active.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'visitor-card';
+      card.innerHTML = `
+        <div class="visitor-avatar">${v.full_name[0]}</div>
+        <div class="visitor-info">
+          <div class="visitor-name-row">
+            <span class="visitor-name">${v.full_name}</span>
+            ${v.total_visits >= 2 ? `<span class="frequent-tag">${v.total_visits} visits</span>` : ''}
+          </div>
+          <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
+        </div>
+        <button class="btn-checkout" onclick="checkOutVisitor(${v.id})">Check Out</button>
+      `;
+      listEl.appendChild(card);
+    });
+  }
+
+  function checkOutVisitor(id) {
+    const v = currentVisitors.find(x => x.id === id);
+    if (v) {
+      v.is_present = false;
+      renderDashboard();
+      renderActiveList();
+      alert(`Visitor ${v.full_name} checked-out.`);
+    }
+  }
+
+  // Smart Lookup: Auto-fetch returning visitor
+  function handleLookup(query) {
+    const q = query.trim().toLowerCase();
+    const banner = document.getElementById('returningBanner');
+    if (q.length < 3) {
+      banner.style.display = 'none';
+      matchedReturning = null;
+      return;
+    }
+
+    const match = currentVisitors.find(v => 
+      v.full_name.toLowerCase().includes(q) ||
+      (v.phone_number && v.phone_number.includes(q)) ||
+      (v.vehicle_number && v.vehicle_number.toLowerCase().includes(q)) ||
+      v.visitor_code.toLowerCase().includes(q)
+    );
+
+    if (match) {
+      matchedReturning = match;
+      document.getElementById('bannerName').innerText = match.full_name;
+      document.getElementById('bannerVisitsText').innerText = `⭐ RETURNING VISITOR FOUND (${match.total_visits} PREVIOUS VISITS)`;
+      document.getElementById('bannerSub').innerText = `Code: ${match.visitor_code} • Plate: ${match.vehicle_number || 'None'} • Company: ${match.company || 'N/A'}`;
+      banner.style.display = 'flex';
+
+      // Autofill fields
+      document.getElementById('formName').value = match.full_name;
+      document.getElementById('formPhone').value = match.phone_number || '';
+      document.getElementById('formPlate').value = match.vehicle_number || '';
+      document.getElementById('formCompany').value = match.company || '';
+    } else {
+      banner.style.display = 'none';
+      matchedReturning = null;
+    }
+  }
+
+  function confirmReturningEntry() {
+    if (!matchedReturning) return;
+    matchedReturning.is_present = true;
+    matchedReturning.total_visits += 1;
+    renderDashboard();
+    alert(`Entry confirmed for returning visitor: ${matchedReturning.full_name} (Visit #${matchedReturning.total_visits})`);
+    showDashboard();
+  }
+
+  function submitNewVisitor() {
+    const name = document.getElementById('formName').value.trim();
+    const phone = document.getElementById('formPhone').value.trim();
+    if (!name || !phone) {
+      alert('Please fill in Full Name and Phone Number.');
+      return;
+    }
+
+    if (matchedReturning) {
+      confirmReturningEntry();
+      return;
+    }
+
+    const newV = {
+      id: currentVisitors.length + 1,
+      visitor_code: 'VIS-' + (10000 + currentVisitors.length + 1),
+      full_name: name,
+      phone_number: phone,
+      vehicle_number: document.getElementById('formPlate').value.trim().toUpperCase() || null,
+      company: document.getElementById('formCompany').value.trim() || null,
+      category: document.getElementById('formCategory').value,
+      total_visits: 1,
+      is_present: true
+    };
+
+    currentVisitors.push(newV);
+    renderDashboard();
+    alert(`Pass Issued! Code: ${newV.visitor_code} for ${newV.full_name}`);
+    showDashboard();
+  }
+
+  // Camera Match Pop-up Alert
+  function triggerCameraPopup(visitor) {
+    const target = visitor || currentVisitors.find(v => v.id === 2) || currentVisitors[0];
+    document.getElementById('modalAvatar').innerText = target.full_name[0];
+    document.getElementById('modalName').innerText = target.full_name;
+    document.getElementById('modalCode').innerText = target.visitor_code;
+    document.getElementById('modalCompany').innerText = target.company || 'Visitor';
+    document.getElementById('modalPlate').innerText = target.vehicle_number || 'N/A';
+    document.getElementById('modalVisits').innerText = `${target.total_visits} Visits (Frequent Visitor)`;
+    document.getElementById('modalPhone').innerText = target.phone_number || 'N/A';
+
+    // Play subtle audio beep/notification chime
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.18);
+    } catch (_) {}
+
+    document.getElementById('cameraModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('cameraModal').style.display = 'none';
+  }
+
+  function confirmModalEntry() {
+    closeModal();
+    const target = currentVisitors.find(v => v.id === 2) || currentVisitors[0];
+    target.is_present = true;
+    target.total_visits += 1;
+    renderDashboard();
+    alert(`Entry confirmed for ${target.full_name} at Gate 1.`);
+  }
+
+  // Navigation handlers
+  function hideAllViews() {
+    document.getElementById('viewDashboard').style.display = 'none';
+    document.getElementById('viewEntry').style.display = 'none';
+    document.getElementById('viewActive').style.display = 'none';
+    document.getElementById('viewHistory').style.display = 'none';
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  }
+
+  function showDashboard() {
+    hideAllViews();
+    document.getElementById('viewDashboard').style.display = 'block';
+    document.getElementById('navDash').classList.add('active');
+    renderDashboard();
+  }
+
+  function showEntryForm(searchFocus = false) {
+    hideAllViews();
+    document.getElementById('viewEntry').style.display = 'block';
+    document.getElementById('navEntry').classList.add('active');
+    if (searchFocus) {
+      setTimeout(() => document.getElementById('lookupInput').focus(), 100);
+    }
+  }
+
+  function showActiveView() {
+    hideAllViews();
+    document.getElementById('viewActive').style.display = 'block';
+    document.getElementById('navActive').classList.add('active');
+    renderActiveList();
+  }
+
+  function renderActiveList() {
+    const listEl = document.getElementById('fullActiveList');
+    listEl.innerHTML = '';
+    const active = currentVisitors.filter(v => v.is_present);
+    if (active.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No visitors currently inside.</div>';
+      return;
+    }
+    active.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'visitor-card';
+      card.innerHTML = `
+        <div class="visitor-avatar">${v.full_name[0]}</div>
+        <div class="visitor-info">
+          <div class="visitor-name-row">
+            <span class="visitor-name">${v.full_name}</span>
+            ${v.total_visits >= 2 ? `<span class="frequent-tag">${v.total_visits} visits</span>` : ''}
+          </div>
+          <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
+          ${v.company ? `<div style="font-size:11px; color:var(--text-muted);">${v.company}</div>` : ''}
+        </div>
+        <button class="btn-checkout" onclick="checkOutVisitor(${v.id})">Check Out</button>
+      `;
+      listEl.appendChild(card);
+    });
+  }
+
+  function showHistoryView() {
+    hideAllViews();
+    document.getElementById('viewHistory').style.display = 'block';
+    document.getElementById('navHistory').classList.add('active');
+    renderFrequentList();
+  }
+
+  function renderFrequentList() {
+    const listEl = document.getElementById('frequentListContainer');
+    listEl.innerHTML = '';
+    const frequent = currentVisitors.filter(v => v.total_visits >= 2);
+    frequent.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'visitor-card';
+      card.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      card.innerHTML = `
+        <div class="visitor-avatar" style="color:var(--accent-amber); font-weight:800;">${v.full_name[0]}</div>
+        <div class="visitor-info">
+          <div class="visitor-name-row">
+            <span class="visitor-name">${v.full_name}</span>
+            <span class="frequent-tag">${v.total_visits} visits</span>
+          </div>
+          <div class="visitor-sub">${v.visitor_code} • Plate: ${v.vehicle_number || 'N/A'}</div>
+          <div style="font-size:11px; color:var(--text-muted);">Phone: ${v.phone_number || 'N/A'}</div>
+        </div>
+        <button onclick="triggerCameraPopup(currentVisitors.find(x => x.id === ${v.id}))" style="background:var(--card-dark); color:var(--accent-amber); border:1px solid rgba(245, 158, 11, 0.4); padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">
+          Test Match
+        </button>
+      `;
+      listEl.appendChild(card);
+    });
+  }
+
+  document.getElementById('btnSimulate').addEventListener('click', () => triggerCameraPopup());
+
+  // Initial load
+  renderDashboard();
+</script>
+
+</body>
+</html>
