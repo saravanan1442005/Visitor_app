@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "args",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/args-2.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "async",
       "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.12.0",
       "packageUri": "lib/",
@@ -80,6 +86,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "flutter_svg",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///C:/Flutter/src/flutter/packages/flutter_test",
       "packageUri": "lib/",
@@ -90,6 +102,18 @@
       "rootUri": "file:///C:/Flutter/src/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "google_fonts",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "heroicons",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/heroicons-0.11.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "http",
@@ -164,6 +188,30 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "path_parsing",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/path_parsing-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "path_provider",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider-2.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "path_provider_android",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.19",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "path_provider_foundation",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "path_provider_linux",
       "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_linux-2.2.1",
       "packageUri": "lib/",
@@ -180,6 +228,12 @@
       "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_windows-2.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "petitparser",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-6.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
     },
     {
       "name": "platform",
@@ -296,6 +350,24 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "vector_graphics",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.19",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "vector_graphics_codec",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.13",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "vector_graphics_compiler",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.1.19",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "vector_math",
       "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
@@ -320,13 +392,19 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "xml",
+      "rootUri": "file:///C:/Users/balaj/AppData/Local/Pub/Cache/hosted/pub.dev/xml-6.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "visitor_guard_app",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2026-10-26T06:55:19.680170Z",
+  "generated": "2026-10-26T06:59:36.627280Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///C:/Flutter/src/flutter",

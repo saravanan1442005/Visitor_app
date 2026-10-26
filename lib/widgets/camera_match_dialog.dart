@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:heroicons/heroicons.dart';
 import '../config/constants.dart';
 import '../models/camera_match_event.dart';
 
@@ -36,27 +37,30 @@ class CameraMatchDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final visitor = event.visitor;
     final isFrequent = visitor.isFrequentVisitor;
+    final primaryColor = isFrequent ? AppConstants.accentAmber : AppConstants.accentGreen;
+    final lightColor = isFrequent ? AppConstants.amberLight : AppConstants.greenLight;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: AppConstants.surfaceDark,
-      elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      backgroundColor: AppConstants.surfaceWhite,
+      elevation: 12,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Container(
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
-          color: AppConstants.surfaceDark,
-          borderRadius: BorderRadius.circular(20),
+          color: AppConstants.surfaceWhite,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isFrequent ? AppConstants.accentAmber : AppConstants.accentGreen,
-            width: 2,
+            color: primaryColor.withValues(alpha: 0.6),
+            width: 1.8,
           ),
           boxShadow: [
             BoxShadow(
-              color: (isFrequent ? AppConstants.accentAmber : AppConstants.accentGreen).withOpacity(0.25),
-              blurRadius: 30,
+              color: primaryColor.withValues(alpha: 0.15),
+              blurRadius: 24,
               spreadRadius: 2,
-            )
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
         child: Column(
@@ -69,13 +73,14 @@ class CameraMatchDialog extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: (isFrequent ? AppConstants.accentAmber : AppConstants.accentGreen).withOpacity(0.15),
+                    color: lightColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    isFrequent ? Icons.stars_rounded : Icons.camera_alt_rounded,
-                    color: isFrequent ? AppConstants.accentAmber : AppConstants.accentGreen,
-                    size: 28,
+                  child: HeroIcon(
+                    isFrequent ? HeroIcons.sparkles : HeroIcons.videoCamera,
+                    color: primaryColor,
+                    size: 24,
+                    style: HeroIconStyle.solid,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -85,19 +90,20 @@ class CameraMatchDialog extends StatelessWidget {
                     children: [
                       Text(
                         isFrequent ? 'FREQUENT VISITOR DETECTED' : 'CAMERA MATCH DETECTED',
-                        style: TextStyle(
-                          color: isFrequent ? AppConstants.accentAmber : AppConstants.accentGreen,
+                        style: GoogleFonts.roboto(
+                          color: primaryColor,
                           fontWeight: FontWeight.w800,
                           fontSize: 13,
-                          letterSpacing: 1.1,
+                          letterSpacing: 0.8,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         event.cameraName,
-                        style: const TextStyle(
+                        style: GoogleFonts.nunito(
                           color: AppConstants.textSecondary,
                           fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -105,35 +111,35 @@ class CameraMatchDialog extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: AppConstants.textSecondary, size: 20),
+                  icon: const HeroIcon(HeroIcons.xMark, color: AppConstants.textMuted, size: 20),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
               ],
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             const Divider(color: AppConstants.borderLight, height: 1),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
             // Visitor Profile Summary Card
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppConstants.primaryDark,
-                borderRadius: BorderRadius.circular(14),
+                color: AppConstants.inputFill,
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppConstants.borderLight),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 30,
-                    backgroundColor: AppConstants.cardDark,
+                    radius: 28,
+                    backgroundColor: lightColor,
                     child: Text(
                       visitor.fullName.isNotEmpty ? visitor.fullName[0].toUpperCase() : 'V',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
+                      style: GoogleFonts.roboto(
+                        color: primaryColor,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -145,38 +151,40 @@ class CameraMatchDialog extends StatelessWidget {
                       children: [
                         Text(
                           visitor.fullName,
-                          style: const TextStyle(
+                          style: GoogleFonts.roboto(
                             color: AppConstants.textPrimary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppConstants.cardDark,
-                                borderRadius: BorderRadius.circular(4),
+                                color: AppConstants.blueLight,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: AppConstants.accentBlue.withValues(alpha: 0.3)),
                               ),
                               child: Text(
                                 visitor.visitorCode,
-                                style: const TextStyle(
+                                style: GoogleFonts.roboto(
                                   color: AppConstants.accentBlue,
                                   fontSize: 11,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 6),
-                            if (visitor.company != null)
+                            const SizedBox(width: 8),
+                            if (visitor.company != null && visitor.company!.isNotEmpty)
                               Expanded(
                                 child: Text(
                                   visitor.company!,
-                                  style: const TextStyle(
+                                  style: GoogleFonts.nunito(
                                     color: AppConstants.textSecondary,
                                     fontSize: 12,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -190,19 +198,20 @@ class CameraMatchDialog extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Detection Metrics & Visit Stats
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: AppConstants.cardDark.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
+                color: AppConstants.surfaceWhite,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppConstants.borderLight),
               ),
               child: Column(
                 children: [
                   _buildDetailRow(
-                    icon: Icons.repeat_rounded,
+                    heroIcon: HeroIcons.sparkles,
                     label: 'Total Visits',
                     value: '${visitor.totalVisits} visits (${isFrequent ? "Frequent" : "Returning"})',
                     valueColor: AppConstants.accentAmber,
@@ -210,17 +219,17 @@ class CameraMatchDialog extends StatelessWidget {
                   if (visitor.vehicleNumber != null && visitor.vehicleNumber!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildDetailRow(
-                      icon: Icons.directions_car_rounded,
+                      heroIcon: HeroIcons.truck,
                       label: 'Vehicle Plate',
                       value: visitor.vehicleNumber!,
-                      valueColor: Colors.white,
+                      valueColor: AppConstants.textPrimary,
                       isPlate: true,
                     ),
                   ],
-                  if (visitor.phoneNumber != null) ...[
+                  if (visitor.phoneNumber != null && visitor.phoneNumber!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildDetailRow(
-                      icon: Icons.phone_rounded,
+                      heroIcon: HeroIcons.phone,
                       label: 'Phone',
                       value: visitor.phoneNumber!,
                       valueColor: AppConstants.textSecondary,
@@ -228,7 +237,7 @@ class CameraMatchDialog extends StatelessWidget {
                   ],
                   const SizedBox(height: 8),
                   _buildDetailRow(
-                    icon: Icons.verified_user_rounded,
+                    heroIcon: HeroIcons.shieldCheck,
                     label: 'Match Confidence',
                     value: '${(event.confidence * 100).toStringAsFixed(1)}% (${event.matchType})',
                     valueColor: AppConstants.accentGreen,
@@ -237,7 +246,7 @@ class CameraMatchDialog extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
 
             // Action Buttons
             Row(
@@ -251,7 +260,10 @@ class CameraMatchDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('Dismiss'),
+                    child: Text(
+                      'Dismiss',
+                      style: GoogleFonts.nunito(fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -264,15 +276,16 @@ class CameraMatchDialog extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppConstants.accentGreen,
-                      foregroundColor: Colors.black,
+                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      elevation: 4,
+                      elevation: 2,
+                      shadowColor: AppConstants.accentGreen.withValues(alpha: 0.3),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    icon: const Icon(Icons.check_circle_rounded, size: 20),
-                    label: const Text(
+                    icon: const HeroIcon(HeroIcons.checkCircle, size: 20, color: Colors.white, style: HeroIconStyle.solid),
+                    label: Text(
                       'Confirm Entry',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: GoogleFonts.roboto(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 0.5),
                     ),
                   ),
                 ),
@@ -285,7 +298,7 @@ class CameraMatchDialog extends StatelessWidget {
   }
 
   Widget _buildDetailRow({
-    required IconData icon,
+    required HeroIcons heroIcon,
     required String label,
     required String value,
     required Color valueColor,
@@ -293,37 +306,37 @@ class CameraMatchDialog extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: AppConstants.textSecondary),
+        HeroIcon(heroIcon, size: 16, color: AppConstants.textSecondary),
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(color: AppConstants.textSecondary, fontSize: 12),
+          style: GoogleFonts.nunito(color: AppConstants.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
         ),
         const Spacer(),
         if (isPlate)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.amber.shade900.withOpacity(0.3),
+              color: AppConstants.amberLight,
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.amber.shade700, width: 0.8),
+              border: Border.all(color: AppConstants.accentAmber.withValues(alpha: 0.4), width: 0.8),
             ),
             child: Text(
               value,
-              style: const TextStyle(
-                color: Colors.amber,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.roboto(
+                color: AppConstants.accentAmber,
+                fontWeight: FontWeight.w800,
                 fontSize: 12,
-                letterSpacing: 1.1,
+                letterSpacing: 1.0,
               ),
             ),
           )
         else
           Text(
             value,
-            style: TextStyle(
+            style: GoogleFonts.nunito(
               color: valueColor,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
               fontSize: 12,
             ),
           ),
