@@ -7,12 +7,14 @@ import '../models/camera_match_event.dart';
 class CameraMatchDialog extends StatelessWidget {
   final CameraMatchEvent event;
   final VoidCallback onConfirmEntry;
+  final VoidCallback? onConfirmExit;
   final VoidCallback? onViewDetails;
 
   const CameraMatchDialog({
     super.key,
     required this.event,
     required this.onConfirmEntry,
+    this.onConfirmExit,
     this.onViewDetails,
   });
 
@@ -20,6 +22,7 @@ class CameraMatchDialog extends StatelessWidget {
     BuildContext context, {
     required CameraMatchEvent event,
     required VoidCallback onConfirmEntry,
+    VoidCallback? onConfirmExit,
     VoidCallback? onViewDetails,
   }) {
     return showDialog(
@@ -28,6 +31,7 @@ class CameraMatchDialog extends StatelessWidget {
       builder: (ctx) => CameraMatchDialog(
         event: event,
         onConfirmEntry: onConfirmEntry,
+        onConfirmExit: onConfirmExit,
         onViewDetails: onViewDetails,
       ),
     );
@@ -272,7 +276,11 @@ class CameraMatchDialog extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      onConfirmEntry();
+                      if (event.eventType == 'EXIT' && onConfirmExit != null) {
+                        onConfirmExit!();
+                      } else {
+                        onConfirmEntry();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppConstants.accentGreen,
@@ -282,9 +290,14 @@ class CameraMatchDialog extends StatelessWidget {
                       shadowColor: AppConstants.accentGreen.withValues(alpha: 0.3),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    icon: const HeroIcon(HeroIcons.checkCircle, size: 20, color: Colors.white, style: HeroIconStyle.solid),
+                    icon: HeroIcon(
+                      event.eventType == 'EXIT' ? HeroIcons.arrowRightOnRectangle : HeroIcons.checkCircle,
+                      size: 20,
+                      color: Colors.white,
+                      style: HeroIconStyle.solid,
+                    ),
                     label: Text(
-                      'Confirm Entry',
+                      event.eventType == 'EXIT' ? 'Confirm Exit' : 'Confirm Entry',
                       style: GoogleFonts.roboto(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 0.5),
                     ),
                   ),

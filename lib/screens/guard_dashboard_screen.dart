@@ -30,15 +30,19 @@ class _GuardDashboardScreenState extends State<GuardDashboardScreen> {
     super.initState();
     final api = Provider.of<ApiService>(context, listen: false);
 
-    // Listen to camera match alerts and show interactive popup only when camera is connected
+    // Display both live backend matches and locally simulated match events.
     _cameraSubscription = api.onCameraMatch.listen((event) {
-      if (!_isCameraConnected) return; // Ignore events if camera is disconnected
       if (mounted) {
         CameraMatchDialog.show(
           context,
           event: event,
           onConfirmEntry: () async {
-            await api.confirmEntry(event.visitor.id, source: 'CAMERA_MATCH_CONFIRMED');
+            await api.confirmEntry(
+              event.visitor.id,
+              source: event.source,
+              cameraId: event.cameraId,
+              confidence: event.confidence,
+            );
             _loadData();
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -48,6 +52,28 @@ class _GuardDashboardScreenState extends State<GuardDashboardScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   content: Text(
                     'Entry confirmed for ${event.visitor.fullName} (${event.visitor.visitorCode})',
+                    style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              );
+            }
+          },
+          onConfirmExit: () async {
+            await api.confirmExit(
+              event.visitor.id,
+              source: event.source,
+              cameraId: event.cameraId,
+              confidence: event.confidence,
+            );
+            _loadData();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppConstants.accentBlue,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  content: Text(
+                    'Exit confirmed for ${event.visitor.fullName} (${event.visitor.visitorCode})',
                     style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -123,20 +124,40 @@ class ApiService extends ChangeNotifier {
     String? company,
     String? category,
     String? notes,
+    String? profilePhotoPath,
+    Uint8List? profilePhotoBytes,
+    String profilePhotoName = 'visitor.jpg',
   }) async {
     try {
-      final res = await http.post(
-        Uri.parse('$_baseUrl/api/v2/registration/visitors'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'full_name': fullName,
-          'phone': phone,
-          'vehicle_number': vehicleNumber?.toUpperCase(),
-          'company': company,
-          'category': category ?? 'Guest',
-          'notes': notes,
-        }),
-      ).timeout(const Duration(seconds: 5));
+      final fields = <String, String>{
+        'full_name': fullName,
+        'phone': phone,
+        'vehicle_number': vehicleNumber?.toUpperCase() ?? '',
+        'company': company ?? '',
+        'category': category ?? 'Guest',
+        'notes': notes ?? '',
+      };
+      http.Response res;
+      if (profilePhotoBytes != null) {
+        final request = http.MultipartRequest(
+          'POST',
+          Uri.parse('$_baseUrl/api/v2/registration/visitors'),
+        )..headers.addAll(_getHeaders());
+        request.fields.addAll(fields);
+        request.files.add(http.MultipartFile.fromBytes(
+          'photo',
+          profilePhotoBytes,
+          filename: profilePhotoName,
+        ));
+        final streamed = await request.send().timeout(const Duration(seconds: 8));
+        res = await http.Response.fromStream(streamed);
+      } else {
+        res = await http.post(
+          Uri.parse('$_baseUrl/api/v2/registration/visitors'),
+          headers: _getHeaders({'Content-Type': 'application/json'}),
+          body: jsonEncode(fields),
+        ).timeout(const Duration(seconds: 5));
+      }
 
       if (res.statusCode == 201 || res.statusCode == 200) {
         final data = jsonDecode(res.body);
@@ -156,14 +177,21 @@ class ApiService extends ChangeNotifier {
   }
 
   // --- Confirm Entry (Returning Visitor or New) ---
-  Future<bool> confirmEntry(int visitorId, {String source = 'MANUAL'}) async {
+  Future<bool> confirmEntry(
+    int visitorId, {
+    String source = 'MANUAL',
+    int? cameraId,
+    double? confidence,
+  }) async {
     try {
       final res = await http.post(
         Uri.parse('$_baseUrl/api/v2/registration/entries'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getHeaders({'Content-Type': 'application/json'}),
         body: jsonEncode({
           'visitor_id': visitorId,
           'source': source,
+          if (cameraId != null) 'camera_id': cameraId,
+          if (confidence != null) 'confidence': confidence,
         }),
       ).timeout(const Duration(seconds: 4));
 
@@ -175,14 +203,21 @@ class ApiService extends ChangeNotifier {
   }
 
   // --- Confirm Exit (Check Out) ---
-  Future<bool> confirmExit(int visitorId) async {
+  Future<bool> confirmExit(
+    int visitorId, {
+    String source = 'MANUAL',
+    int? cameraId,
+    double? confidence,
+  }) async {
     try {
       final res = await http.post(
         Uri.parse('$_baseUrl/api/v2/registration/exit'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _getHeaders({'Content-Type': 'application/json'}),
         body: jsonEncode({
           'visitor_id': visitorId,
-          'source': 'MANUAL',
+          'source': source,
+          if (cameraId != null) 'camera_id': cameraId,
+          if (confidence != null) 'confidence': confidence,
         }),
       ).timeout(const Duration(seconds: 4));
 
@@ -271,9 +306,38 @@ class ApiService extends ChangeNotifier {
   // Background polling for gate camera recognition events
   void _startCameraAlertPolling() {
     _pollingTimer?.cancel();
-    _pollingTimer = Timer.periodic(const Duration(seconds: 12), (timer) async {
-      // In production, listens to Supabase Realtime WebSocket or polls backend events
+    _pollCameraAlerts();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) async {
+      await _pollCameraAlerts();
     });
+  }
+
+  Future<void> _pollCameraAlerts() async {
+    try {
+      if (_token == null) await _authenticate();
+      final res = await http.get(
+        Uri.parse('$_baseUrl/api/v2/registration/camera-alerts'),
+        headers: _getHeaders(),
+      ).timeout(const Duration(seconds: 4));
+      if (res.statusCode != 200) {
+        debugPrint('Camera alert polling failed: ${res.statusCode}');
+        return;
+      }
+      final data = jsonDecode(res.body);
+      final alerts = (data['alerts'] as List? ?? []);
+      for (final rawAlert in alerts) {
+        if (rawAlert is Map) {
+          _cameraMatchController.add(
+            CameraMatchEvent.fromJson(
+              rawAlert.cast<String, dynamic>(),
+              baseUrl: _baseUrl,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Camera alert polling error: $e');
+    }
   }
 
   List<Visitor> _getMockSearchResults(String query) {

@@ -17,6 +17,7 @@ dependencies:
   uuid: ^4.3.3
   google_fonts: ^6.3.2
   heroicons: ^0.11.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

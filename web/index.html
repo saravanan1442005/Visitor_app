@@ -815,6 +815,22 @@
         <input type="text" id="formCompany" class="form-control" placeholder="e.g. EcoTech / Visitor">
       </div>
       <div class="form-group">
+        <label>Visitor Photo</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <button type="button" onclick="openVisitorCamera()" style="flex: 1; padding: 10px; border: 1px solid var(--accent-blue); border-radius: 9px; background: var(--blue-light); color: var(--accent-blue); font-weight: 800; cursor: pointer;">
+            Open Camera
+          </button>
+          <label for="formPhoto" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid var(--border-light); border-radius: 9px; background: var(--input-bg); color: var(--text-secondary); font-weight: 800; font-size: 13px; cursor: pointer;">
+            Choose Photo
+          </label>
+        </div>
+        <label for="formPhoto" id="photoPicker" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-light); border-radius: 12px; cursor: pointer;">
+          <span id="photoPreview" style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: var(--blue-light); color: var(--accent-blue); font-size: 24px;">▣</span>
+          <span id="photoLabel" style="color: var(--text-secondary); font-size: 13px; font-weight: 700;">Capture or choose a photo for identification</span>
+        </label>
+        <input type="file" id="formPhoto" accept="image/*" capture="user" style="display: none;" onchange="previewVisitorPhoto(this)">
+      </div>
+      <div class="form-group">
         <label>Visitor Category</label>
         <select id="formCategory" class="form-control">
           <option value="Guest">Guest / Visitor</option>
@@ -1281,6 +1297,7 @@
     const company = document.getElementById('formCompany').value.trim();
     const category = document.getElementById('formCategory').value;
     const notes = document.getElementById('formNotes').value.trim();
+    const photo = document.getElementById('formPhoto').files[0];
 
     if (!name || !phone) {
       alert('Please fill in Full Name and Phone Number.');
@@ -1301,6 +1318,10 @@
       if (company) formData.append('company', company);
       formData.append('category', category);
       if (notes) formData.append('notes', notes);
+      if (photo) {
+        formData.append('photo', photo);
+        formData.append('face_consent', 'true');
+      }
 
       const res = await fetch(`${API_BASE}/api/v2/registration/visitors`, {
         method: 'POST',
@@ -1310,6 +1331,9 @@
 
       const data = await res.json();
       if (res.ok && data.visitor) {
+        if (photo && !data.visitor.face_enrolled) {
+          alert('Visitor saved, but no face was enrolled. Please register again with a clear front-facing photo.');
+        }
         // Automatically confirm entry
         await fetch(`${API_BASE}/api/v2/registration/entries`, {
           method: 'POST',
@@ -1323,9 +1347,84 @@
       } else {
         alert(data.error || 'Failed to register visitor.');
       }
+
     } catch (e) {
       alert('Network error connecting to server: ' + e);
     }
+  }
+
+  function previewVisitorPhoto(input) {
+    const photo = input.files[0];
+    if (!photo) return;
+    const preview = document.getElementById('photoPreview');
+    const label = document.getElementById('photoLabel');
+    preview.innerHTML = '';
+    preview.style.overflow = 'hidden';
+    const image = document.createElement('img');
+    image.src = URL.createObjectURL(photo);
+    image.alt = 'Selected visitor photo';
+    image.style.width = '100%';
+    image.style.height = '100%';
+    image.style.objectFit = 'cover';
+    preview.appendChild(image);
+    label.textContent = 'Photo selected — click to replace';
+  }
+
+  let visitorCameraStream = null;
+
+  async function openVisitorCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      document.getElementById('formPhoto').click();
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'visitorCameraModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,.92);display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `
+      <div style="width:min(100%,420px);background:#fff;border-radius:16px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <strong style="color:#0F172A;font-size:16px;">Take visitor photo</strong>
+          <button type="button" onclick="closeVisitorCamera()" style="border:0;background:none;color:#475569;font-size:22px;cursor:pointer;">&times;</button>
+        </div>
+        <video id="visitorCameraVideo" autoplay playsinline style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;background:#0F172A;"></video>
+        <button type="button" onclick="captureVisitorPhoto()" style="width:100%;margin-top:12px;padding:14px;border:0;border-radius:10px;background:#008000;color:#fff;font-weight:800;font-size:14px;cursor:pointer;">Capture Photo</button>
+      </div>`;
+    document.body.appendChild(modal);
+
+    try {
+      visitorCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      document.getElementById('visitorCameraVideo').srcObject = visitorCameraStream;
+    } catch (error) {
+      closeVisitorCamera();
+      alert('Camera access was not granted. Please allow camera permission or choose a photo instead.');
+    }
+  }
+
+  function captureVisitorPhoto() {
+    const video = document.getElementById('visitorCameraVideo');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const file = new File([blob], `visitor-photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      const input = document.getElementById('formPhoto');
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+      previewVisitorPhoto(input);
+      closeVisitorCamera();
+    }, 'image/jpeg', 0.88);
+  }
+
+  function closeVisitorCamera() {
+    if (visitorCameraStream) {
+      visitorCameraStream.getTracks().forEach((track) => track.stop());
+      visitorCameraStream = null;
+    }
+    document.getElementById('visitorCameraModal')?.remove();
   }
 
   // Camera Connection State (default false: no camera hardware connected)
@@ -1538,15 +1637,18 @@
   async function startMobileScanner() {
     try {
       stopMobileScanner();
+      const authPromise = ensureAuth();
       const constraints = {
         video: {
           facingMode: { ideal: currentFacingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 640, max: 640 },
+          height: { ideal: 480, max: 480 },
+          frameRate: { ideal: 15, max: 20 }
         },
         audio: false
       };
       scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+      await authPromise;
       const video = document.getElementById('scannerVideo');
       video.srcObject = scannerStream;
       await video.play();
@@ -1603,7 +1705,7 @@
       if (!isScanningPaused && !isScanInProgress) {
         captureAndRecognize();
       }
-    }, 1500);
+    }, 2500);
   }
 
   async function captureAndRecognize() {
@@ -1614,13 +1716,13 @@
     try {
       const canvas = document.getElementById('scannerCanvas');
       const ctx = canvas.getContext('2d');
-      const w = 480;
-      const h = Math.round(video.videoHeight * (480 / video.videoWidth)) || 360;
+      const w = 320;
+      const h = Math.round(video.videoHeight * (320 / video.videoWidth)) || 240;
       canvas.width = w;
       canvas.height = h;
       ctx.drawImage(video, 0, 0, w, h);
 
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
       await ensureAuth();
 
       const res = await fetch(`${API_BASE}/api/v2/registration/face/recognize`, {
@@ -1634,12 +1736,15 @@
         const matches = data.matches || [];
         if (matches.length > 0) {
           const match = matches[0];
+          const matchedVisitor = match.visitor || match;
           const visitor = currentVisitors.find(v => v.id === match.visitor_id) || {
             id: match.visitor_id,
-            full_name: match.full_name,
-            visitor_code: match.visitor_code,
-            total_visits: 2,
-            vehicle_number: 'N/A'
+            full_name: matchedVisitor.full_name || 'Recognized visitor',
+            visitor_code: matchedVisitor.visitor_code || 'VISITOR',
+            total_visits: matchedVisitor.total_visits || 1,
+            vehicle_number: matchedVisitor.vehicle_number || 'N/A',
+            company: matchedVisitor.company || 'Visitor',
+            phone_number: matchedVisitor.phone_number || ''
           };
           latestScannerMatch = visitor;
 

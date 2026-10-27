@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../config/constants.dart';
 import '../models/visitor.dart';
@@ -29,6 +31,8 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
   Visitor? _matchedReturningVisitor;
   bool _isSearching = false;
   bool _isSubmitting = false;
+  XFile? _profilePhoto;
+  Uint8List? _profilePhotoBytes;
 
   @override
   void initState() {
@@ -39,6 +43,27 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
     if (query.trim().length < 3) {
       setState(() => _matchedReturningVisitor = null);
       return;
+    }
+
+    Future<void> _pickProfilePhoto() async {
+      final picker = ImagePicker();
+      final photo = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1200,
+        imageQuality: 85,
+      ) ?? await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1200,
+        imageQuality: 85,
+      );
+      if (photo == null) return;
+      final bytes = await photo.readAsBytes();
+      if (mounted) {
+        setState(() {
+          _profilePhoto = photo;
+          _profilePhotoBytes = bytes;
+        });
+      }
     }
 
     setState(() => _isSearching = true);
@@ -106,6 +131,9 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
         company: _companyController.text.trim(),
         category: _selectedCategory,
         notes: _notesController.text.trim(),
+        profilePhotoPath: _profilePhoto?.path,
+        profilePhotoBytes: _profilePhotoBytes,
+        profilePhotoName: _profilePhoto?.name ?? 'visitor.jpg',
       );
 
       setState(() => _isSubmitting = false);
@@ -523,6 +551,77 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                       label: 'Company / Organization',
                       heroIcon: HeroIcons.buildingOffice,
                       hint: 'e.g. EcoTech / Visitor',
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Text(
+                      'Visitor Photo',
+                      style: GoogleFonts.nunito(
+                        color: AppConstants.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    InkWell(
+                      onTap: _pickProfilePhoto,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppConstants.inputFill,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppConstants.borderLight),
+                        ),
+                        child: Row(
+                          children: [
+                            if (_profilePhotoBytes != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.memory(
+                                  _profilePhotoBytes!,
+                                  width: 52,
+                                  height: 52,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            else
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: AppConstants.blueLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const HeroIcon(
+                                  HeroIcons.camera,
+                                  color: AppConstants.accentBlue,
+                                  size: 24,
+                                ),
+                              ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _profilePhoto == null
+                                    ? 'Capture or choose a photo for identification'
+                                    : 'Photo selected — tap to replace',
+                                style: GoogleFonts.nunito(
+                                  color: AppConstants.textSecondary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const HeroIcon(
+                              HeroIcons.arrowUpTray,
+                              color: AppConstants.accentBlue,
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     const SizedBox(height: 14),
